@@ -42,7 +42,7 @@ def MI_stimulated_annealing(y:np.array,x:np.array, Model: Callable, Scoring: Cal
         score obtained with the best subset of features """
     
     #Find top N features with the highest mutual information
-    subsetMI , _ = MIR(y, x, Model, Scoring, maximize, N, n_neighbors)
+    subsetMI , _ = MIM(y, x, Model, Scoring, maximize, N, n_neighbors)
     xMI = x[:, subsetMI]
     
     #Run stimulated annealing on MI subset
@@ -89,7 +89,7 @@ def MI_genetic_fs(y:np.array,x:np.array, Model: Callable, Scoring: Callable, max
         score obtained with the best subset of features """
     
     #Find top N features with the highest mutual information
-    subsetMI , _ = MIR(y, x, Model, Scoring, maximize, N, n_neighbors)
+    subsetMI , _ = MIM(y, x, Model, Scoring, maximize, N, n_neighbors)
     xMI = x[:, subsetMI]
     
     #Run gentic algorithm on MI subset
