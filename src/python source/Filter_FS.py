@@ -21,8 +21,9 @@ from pyHSICLasso import HSICLasso
 from pred_score import *
 
 #-----------------------------------------------------------------------------
-#Filter feature selection: the selction is independent from any ML algorithm. The features are selected according to their scores in various statistical tests.
-def MIR(y:np.array,x:np.array, Model: Callable, Scoring: Callable, maximize:bool, N:np.array, n_neighbors: int, plot:bool = False):
+#Filter feature selection: the selection is independent from any ML algorithm. The features are selected according to their scores in various statistical tests.
+
+def MIM(y:np.array,x:np.array, Model: Callable, Scoring: Callable, maximize:bool, N:np.array, n_neighbors: int, plot:bool = False):
     """ Calculate the mutual information and select the ones which has more information gain. 
   
       parameters:
