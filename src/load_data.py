@@ -44,7 +44,7 @@ def select_family_interest_norm_data(families_info:np.array, family_interest:np.
     return norm_data, code
 
 def filter_norm_data(norm_data : np.array, percentage : float = 0.5):
-    """ Finds which genes are expressed in at least 50% of the cells and returns a table that indicates that result
+    """ Finds which genes are expressed in at least 50% (default) of the cells and returns a binary table 
     
     parameters:
     norm_data : np.array,
