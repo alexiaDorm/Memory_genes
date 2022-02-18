@@ -113,7 +113,7 @@ def ANOVA(y:np.array,x:np.array, Model: Callable, Scoring: Callable, maximize:bo
     plot_score = []
     
     #Compute Anova test
-    anova = f_classif(x,y)
+    anova, _ = f_classif(x,y)
     index_sorted  = np.argsort(anova)
     
     best_subset, best_score= None, None

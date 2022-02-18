@@ -144,6 +144,20 @@ def compute_statTP(family:np.array,pred: np.array):
     
     return TP, FP, ratio, sensitivity, specificity, precision, NPV, FDR, FNR
 
+def compute_ratio(family:np.array, pred: np.array):
+    """ Compute the TP/FP ratio.
+
+      parameters:
+      pred: np.array,
+        predicted families(cluster)
+      family: np.array,
+        true families of the cells
+     """
+    #Compute TP,FP,TN,FN
+    TP,FP,TN,FN = computeTP(pred, family)
+    
+    return TP/FP
+
 def compute_precision(family:np.array, pred: np.array):
     """ Compute the sensitivity.
 
