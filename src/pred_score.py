@@ -105,7 +105,7 @@ def computeTP(pred: np.array, family:np.array):
     return TP,FP,TN,FN
 
 def compute_statTP(family:np.array,pred: np.array):
-    """ Compute the sensitivity, specificity, precision, NPV, FDR, FNR.
+    """ Compute the TP,FP and ratio, sensitivity, specificity, precision, NPV, FDR, FNR.
 
       parameters:
       pred: np.array,
@@ -130,6 +130,7 @@ def compute_statTP(family:np.array,pred: np.array):
         """
     #Compute TP,FP,TN,FN
     TP,FP,TN,FN = computeTP(pred, family)
+    ratio = TP/FP
     sensitivity, specificity, precision,NPV,FDR,FNR = 0,0,0,0,0,0
     
     sensitivity = TP/(TP+FN) #maybe most important
@@ -141,7 +142,7 @@ def compute_statTP(family:np.array,pred: np.array):
     FNR = FN/(FN+TP)
     
     
-    return sensitivity, specificity, precision, NPV, FDR, FNR
+    return TP, FP, ratio, sensitivity, specificity, precision, NPV, FDR, FNR
 
 def compute_precision(family:np.array, pred: np.array):
     """ Compute the sensitivity.
