@@ -79,7 +79,7 @@ def MIM(y:np.array,x:np.array, Model: Callable, Scoring: Callable, maximize:bool
         plt.plot(N,plot_score)
         plt.xlabel("number of selected features")
         plt.ylabel("score")
-        plt.title("Best score obtained for each number of selected features")
+        plt.title("Best training score obtained for each number of selected features")
         
     return best_subset, best_score
 
