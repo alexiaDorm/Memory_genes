@@ -134,6 +134,7 @@ def cross_validation(y:np.array, x:np.array, Model_test: Callable, Scoring_test:
         model_test = FamiliesClusters(np.unique(y_test),compute_ratio,True)
         pred_test = model_test.fit_predict(x_test[:, subset],y_test)
         test_score = model_test.score(x_test[:, subset],y_test)
+        print(test_score)
         
         #Store best score on current folds
         score_training.append(score)
