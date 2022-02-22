@@ -87,7 +87,7 @@ def getTrainTest(split_y, split_x, i:int, kfold:int):
     return x_train, y_train, x_test, y_test
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Feature selction methods with CV 
-ef cross_validation(y:np.array, x:np.array, Model_test: Callable, Scoring_test: Callable, maximize_test:bool, kfold:int, func: Callable, **kwargs: dict):
+def cross_validation(y:np.array, x:np.array, Model_test: Callable, Scoring_test: Callable, maximize_test:bool, kfold:int, func: Callable, **kwargs: dict):
     """ Cross validate any feature selection method.
   
       parameters:
