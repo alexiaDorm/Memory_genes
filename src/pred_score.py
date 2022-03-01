@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import sklearn
 import math 
-from typing import AnyStr, Callable
+from typing import AnyStr, Callable, Tuple
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import KFold
 from sklearn.base import ClusterMixin,BaseEstimator
@@ -355,6 +355,9 @@ def outer_equal(x:np.array):
     
     return out
 
+#-----------------------------------------------------------------------------------------
+#Iterative custering 
+
 def iterative_clustering(X:np.array, y:np.array, N:int =2, iterations:int =20):
     '''Fit data iteratively using hierachical clustering with the ward2 criterion and use the spearman correlation as the distance measure and predict.
         
@@ -445,77 +448,80 @@ def iterative_clustering(X:np.array, y:np.array, N:int =2, iterations:int =20):
 
     return cell_clusters,co_clustering,cell_clusters_correlation 
 
-class IterativeClustering(ClusterMixin, BaseEstimator):
-    '''
-    Iterative Families clustering
-    Hierachical clustering with the ward2 criterion, use the pearson's correlation as the distance measure.
-    Parameters
-    ----------
-    family_interest: np.array,
-        list of family of interest
-    Scoring : Callable,
-        scoring function use to evaluate the model
-    maximize: bool,
-        if True the scoring function is maximize, else it is minimize
-        
-    Attributes
-    ----------
-    n_clusters_ : int
-        The number of clusters found by the algorithm.
-    labels_ : ndarray of shape (n_samples)
-        Cluster labels for each point.
-    family_interest: np.array,
-        list of family of interest.
-    Scoring : Callable,
-        scoring function use to evaluate the model.
-    maximize: bool,
-        if True the scoring function is maximize, else it is minimize.
-    
-    '''
-    
-    def __init__(self, family_interest_:np.array, Scoring_:Callable, maximize_:bool):
-        super().__init__()
-        self.family_interest_ = family_interest_
-        self.Scoring_ = Scoring_
-        self.maximize_ = maximize_
-        
-    def fit(self, X:np.array, y:np.array, N:int =2, iterations:int =20):
-        '''Fit data using hierachical clustering with the ward2 criterion and use the spearman correlation as the distance measure and predict.
+def process_result_iterative(result:Tuple[np.array,...], y:np.array):
+    ''' Preprocessed the result from the iterative clustering before analysis of results together.
         
         parameters:
         -------
-        x : np.array,
-            features of each data points
+        result: Tuple[np.array,...],
+            result from the iterative clustering (cell_clusters,co_clustering,cell_clusters_correlation)
         y : np.array,
-            family of each data points
-        N : int,
-            max number of 
-        iterations : int,
-            number of iterative clustering
+            family of each data points 
     
 
         Returns
         -------
-        self,
-            return fitted self'''
-        
-        #Iterative clustering algorithm
-        cell_clusters,co_clustering,cell_clusters_correlation = iterative_clustering(X, y, N, iterations)
-        
-        #Score the cluster and determine the number of clusters
-        #score = self.Scoring_(y,clustering)
-        #N = len(np.unique(clustering))
-   
-        #self.n_clusters_, self.labels_, self.score_ = N, clustering, score
-        return cell_clusters,co_clustering,cell_clusters_correlation   
+        '''
+    cell_clusters = result[0]
     
-    def fit_predict(self, X:np.array, y:np.array, N:int =2, iterations:int =20):
-        self.fit(X,y,N,iterations)
-        
-        return self.labels_      
+    cell_clusters_unique_name = cell_clusters
+    cell_clusters_unique_name =  cell_clusters_unique_name.astype(str)
+    for i in range (0, np.shape(cell_clusters)[1]):
+        for j, value in enumerate(cell_clusters_unique_name [:,i]):
+            if not(value == 'nan'):
+                cell_clusters_unique_name [j,i] =  (str(i + 1) + '_' + value)[0:-2]
+
+    values, counts = np.unique(cell_clusters_unique_name, return_counts=True)
+    clustersize_dict = ([values[0:-1], counts[0:-1]])
+  
+    smallest_clusters = (clustersize_dict[0])[clustersize_dict[1] == 2]
+    smallest_clusters = np.append(smallest_clusters,(clustersize_dict[0])[clustersize_dict[1] == 3])
     
-    def score(self, X, y_true):
-        return self.score_
+    best_prediction = outer_equal(y)
+    best_prediction[best_prediction == True] = False
+    for cluster in smallest_clusters:
+        cell_in_cluster = np.nonzero(np.sum(cell_clusters_unique_name==cluster,axis=1))[0]
+        for i in cell_in_cluster:
+            for j in cell_in_cluster:
+                best_prediction[i,j] = True
+                
+    np.fill_diagonal(best_prediction, False)
+
+    return best_prediction
+
+def test_prediction_multiple_overlap_3(result1:Tuple[np.array,...], result2:Tuple[np.array,...], result3:Tuple[np.array,...], y:np.array):
+    ''' Take the prediction from three iterative clustering and blabla
+        
+        parameters:
+        -------
+        result1,2,3: Tuple[np.array,...],
+            result from the iterative clustering (cell_clusters,co_clustering,cell_clusters_correlation)
+        y : np.array,
+            family of each data points 
+    
+
+        Returns
+        -------
+        '''
+
+    best_prediction1 = process_result_iterative(result1, y)
+    best_prediction2 = process_result_iterative(result2, y)
+    best_prediction3 = process_result_iterative(result3, y)
+    real_family_matrix = outer_equal(y)
+    np.fill_diagonal(real_family_matrix, False)
+
+  
+    best_prediction = outer_equal(y)
+    best_prediction[best_prediction == True] = False
+    
+    for cell in range(0, np.shape(best_prediction)[1]):
+        for other_cell in range (0, np.shape(best_prediction)[1]):
+            if ((best_prediction1[cell,other_cell]==True and best_prediction2[cell,other_cell]==True and best_prediction3[cell,other_cell]==True)): 
+                best_prediction[cell,other_cell] = True
+    np.fill_diagonal(best_prediction, False)
+                    
+  
+    return [np.sum(np.logical_and(best_prediction, real_family_matrix)), np.sum(np.logical_and(best_prediction, 1 - real_family_matrix)), int(np.sum(real_family_matrix))]
 
 #---------------------------------------------------------------------------------------------------------------
 #Function to evaluate subset of feature
