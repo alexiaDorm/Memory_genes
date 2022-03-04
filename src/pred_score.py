@@ -157,6 +157,21 @@ def compute_ratio(family:np.array, pred: np.array):
     
     return TP/FP
 
+def compute_RI(family:np.array, pred: np.array):
+    """ Compute the rand index.
+
+      parameters:
+      pred: np.array,
+        predicted families(cluster)
+      family: np.array,
+        true families of the cells
+     """
+    #Compute TP,FP,TN,FN
+    TP,FP,TN,FN = computeTP(pred, family)
+    RI = (TP+TN)/(TP+FP+TN+FN)
+    
+    return RI
+
 def compute_precision(family:np.array, pred: np.array):
     """ Compute the sensitivity.
 
@@ -326,7 +341,7 @@ class FamiliesClusters(ClusterMixin, BaseEstimator):
         
         #Cut the tree into clusters of maximum size equal to the number of cells in the largest family in data set
         if NmaxCluster == None:
-            Nmax = np.max(np.unique(y,return_counts=True)[1])
+            Nmax = math.floor(np.mean(np.unique(y,return_counts=True)[1]))
         else:
             Nmax = NmaxCluster
         clustering = np.squeeze(cut_tree_balanced(Z, max_cluster_size = Nmax)[0])
@@ -383,7 +398,7 @@ def iterative_clustering(X:np.array, y:np.array, N:int =2, iterations:int =20):
             blabla      '''
         #Compute the pearson's correlation of X
     X_pd = pd.DataFrame(X)
-    corr_expr_raw = X_pd.corr(method= 'spearman') #Which correlation mesure used ???
+    corr_expr_raw = X_pd.corr(method= 'pearson') #Which correlation mesure used ???
     corr_expr_raw = np.array(corr_expr_raw)
     corr_expr = np.array((1 - corr_expr_raw)/2)
         
