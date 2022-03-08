@@ -341,13 +341,15 @@ class FamiliesClusters(ClusterMixin, BaseEstimator):
         
         #Cut the tree into clusters of maximum size equal to the number of cells in the largest family in data set
         if NmaxCluster == None:
-            Nmax = math.floor(np.mean(np.unique(y,return_counts=True)[1]))
+            Nmax = round(np.mean(np.unique(y,return_counts=True)[1]))
         else:
             Nmax = NmaxCluster
         clustering = np.squeeze(cut_tree_balanced(Z, max_cluster_size = Nmax)[0])
         
         #Score the cluster and determine the number of clusters
-        score = self.Scoring_(y,clustering)
+        print(len(clustering))
+        #score = self.Scoring_(y,clustering)
+        score = 0
         N = len(np.unique(clustering))
    
         self.n_clusters_, self.labels_, self.score_ = N, clustering, score
