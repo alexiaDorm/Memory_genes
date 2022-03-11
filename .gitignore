@@ -132,3 +132,5 @@ dmypy.json
 */.ipynb_checkpoints/*
 
 data/
+
+.DS_Store
