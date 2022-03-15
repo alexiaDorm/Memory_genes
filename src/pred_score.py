@@ -67,7 +67,7 @@ def computeTP(pred: np.array, family:np.array):
         """
     
     TP,FP,TN,FN = 0,0,0,0 
-    for i in range (min(pred), max(pred)+1):
+    for i in range (min(pred)+1, max(pred)+1):
         #Get which cells are in the ith predicted cluster
         cluster = np.squeeze(np.argwhere(pred==i))
         
@@ -273,6 +273,9 @@ def compute_frac_each_family_same_cluster(family:np.array, pred: np.array):
     
     return np.mean(frac)
 
+def compute_recovery(final_label:np.array):
+    return len(np.nonzero(final_label)[0])/len(final_label)
+
 #---------------------------------------------------------------------------------------------------------------
 #New sklearn class for prediction of families
 class FamiliesClusters(ClusterMixin, BaseEstimator):
@@ -344,12 +347,20 @@ class FamiliesClusters(ClusterMixin, BaseEstimator):
             Nmax = round(np.mean(np.unique(y,return_counts=True)[1]))
         else:
             Nmax = NmaxCluster
+        
         clustering = np.squeeze(cut_tree_balanced(Z, max_cluster_size = Nmax)[0])
         
+        #Assign all cells predicted alone in a cluster the label 0
+        clustering += 1
+        values, counts = np.unique(clustering, return_counts=True)
+        onecell_family = values[np.where(counts==1)]
+        for fam in onecell_family:
+            clustering[clustering == fam] = 0
+        
+        self.recovery = compute_recovery(clustering)
+    
         #Score the cluster and determine the number of clusters
-        print(len(clustering))
-        #score = self.Scoring_(y,clustering)
-        score = 0
+        score = self.Scoring_(y,clustering)
         N = len(np.unique(clustering))
    
         self.n_clusters_, self.labels_, self.score_ = N, clustering, score
