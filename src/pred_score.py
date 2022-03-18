@@ -9,6 +9,7 @@ from sklearn.base import ClusterMixin,BaseEstimator
 from scipy.cluster.hierarchy import ward, cut_tree
 from sklearn.metrics import make_scorer
 from scipy_cut_tree_balanced import cut_tree_balanced
+from Wrapper_FS import mutate
 #-----------------------------------------------------------------------------
 #Few functions for scoring
 
@@ -579,3 +580,169 @@ def evaluate(y:np.array, x:np.array, Model:Callable, Scoring: Callable, maximize
     score = model.score_
 
     return score
+
+#---------------------------------------------------------------------------------------------------------------
+#Repetitive clustering
+
+class EnsemblingHierarchical(ClusterMixin, BaseEstimator):
+    '''
+    Hierachical clustering with the ward2 criterion, use the spearmann's correlation as the distance measure, on N subsets of genes. 
+    Then, use ensembling method to give final cluster assignments.
+    Parameters
+    ----------
+    family_interest: np.array,
+        list of family of interest
+    Scoring : Callable,
+        scoring function use to evaluate the model
+    maximize: bool,
+        if True the scoring function is maximize, else it is minimize
+    subsets: list,
+        list of the different subsets of genes
+    ensembling_: str,
+        ensembling method to produce final clustering
+        
+    Attributes
+    ----------
+    n_clusters_ : int
+        The number of clusters found by the algorithm.
+    labels_ : ndarray of shape (n_samples)
+        Cluster labels for each point.
+    family_interest: np.array,
+        list of family of interest.
+    Scoring_ : Callable,
+        scoring function use to evaluate the model.
+    maximize: bool,
+        if True the scoring function is maximize, else it is minimize.
+    subsets_: list,
+        list of the different subsets of genes
+    ensembling_: str,
+        ensembling method to produce final clustering
+    threshold: float[0,1],
+        two cells need to be predicted in at least <thereshold> of the individual clusterings. Required when ensembling function is 'voting'.
+    
+    '''
+    
+    def __init__(self, family_interest_:np.array, Scoring_:Callable, maximize_:bool, subsets: list, ensembling: str, threshold_voting:float=None):
+        super().__init__()
+        self.family_interest_ = family_interest_
+        self.Scoring_ = Scoring_
+        self.maximize_ = maximize_
+        self.subsets_ = subsets
+        self.ensembling_ = ensembling
+        self.thereshold_voting = threshold_voting
+        
+    def fit(self, X:np.array, y:np.array, NmaxCluster:int=None):
+        '''Fit data using hierachical clustering with the ward2 criterion and use the spearman correlation as the distance measure and predict 
+        on provided subsets.
+        
+        parameters:
+        -------
+        x : np.array,
+            features of each data points
+        y : np.array,
+            family of each data points
+        NmaxCluster : int,
+            max number of cells in a cluster
+
+        return
+        -------
+        self,
+            return fitted self'''
+        
+        clustering = []
+        #Cluster data using the different subsets of features
+        for subset in self.subsets_:
+            model = FamiliesClusters(self.family_interest_, self.Scoring_, self.maximize_)
+            pred = model.fit_predict(X[:,subset],y)
+            if (self.ensembling_ != 'voting'):
+                pred = [np.nan if x == 0 else x for x in pred]
+            clustering.append(pred)
+            
+        print(np.array(clustering).shape)
+            
+        #Get the final clustering from the individual clustering result
+        if self.ensembling_ == 'voting':
+            final_ensembling = ensembling_voting(clustering, self.thereshold_voting)
+        else:
+            final_ensembling = CE.cluster_ensembles(np.array(clustering), solver = self.ensembling_)
+        
+        #Score the cluster and determine the number of clusters
+        score = self.Scoring_(y,final_ensembling)
+        N = len(np.unique(final_ensembling))
+   
+        self.n_clusters_, self.labels_, self.score_ = N, final_ensembling, score
+        self.recovery = compute_recovery(final_ensembling)
+    
+        return self
+    
+    def fit_predict(self, X:np.array, y:np.array,NmaxCluster:int = None):
+        self.fit(X,y,NmaxCluster)
+        
+        return self.labels_ 
+    
+    def score(self, X, y_true):
+        return self.score_
+    
+
+def outer_equal_ignore_zero(x:np.array):
+    out = np.zeros((len(x),len(x)))
+    for i in range(0,len(x)):
+        for j in range(0,len(x)):
+            if x[i] != 0 or x[j] != 0:
+                 out[i,j] = x[i] == x[j]
+    
+    return out
+
+
+def ensembling_voting(clustering:list, threshold:float):
+    """ Compute the final clustering from given individual clustering. 
+    Two cells that are the most of the clusterings predict together are together in the final clustering. 
+  
+      parameters:
+      clustering: list,
+        list of the independent clusterings from which the final clustering is computed
+      threshold: float[0,1],
+        two cells need to be predicted in at least <thereshold> of the individual clusterings
+
+      return:
+      final_label: np.array,
+        final computed 
+    """
+    #Compute co_occurrence matrix of the clustering
+    co_occurrence = np.zeros((len(clustering[0]), len(clustering[0])))
+    for cluster in clustering:
+        co_occurrence += outer_equal_ignore_zero(cluster)
+
+    
+    #Compute final clustering with majority voting
+    N_vote = math.ceil(len(clustering)*threshold) #Vote necessary to consider two cells same family
+    same_family = co_occurrence >= N_vote 
+    for i in range(0,len(clustering[0])):
+        for j in range(0,i+1):
+            same_family[i,j] = False
+    #Get indexes of cell together
+    ind_together = np.nonzero(same_family)
+    final_label = np.zeros((len(clustering[0],)))
+    
+    for i in range(0,len(ind_together[0])):
+        first_cell, second_cell = ind_together[0][i], ind_together[1][i]
+        if final_label[first_cell] == 0 or  final_label[second_cell] == 0:
+            if final_label[first_cell] == 0 and  final_label[second_cell] == 0:
+                final_label[first_cell], final_label[second_cell] = np.max(final_label) + 1, np.max(final_label) + 1
+            else:
+                final_label[first_cell], final_label[second_cell] = np.max([final_label[first_cell], final_label[second_cell]]), np.max([final_label[first_cell], final_label[second_cell]])
+        else:
+            final_label[final_label == final_label[second_cell]] = final_label[first_cell]
+    
+    return final_label.astype(int)
+
+def subsampling_genes(subset:np.array, N:int, p_mutate:float):
+    subsets = []
+    
+    for i in range(0,N):
+        subsets.append((mutate(subset,p_mutate)))
+    
+    for i in range(0,len(subsets)):
+        subsets[i] = subsets[i].astype(bool)
+        
+    return subsets
