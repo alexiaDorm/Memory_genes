@@ -185,7 +185,11 @@ def compute_precision(family:np.array, pred: np.array):
     #Compute TP,FP,TN,FN
     TP,FP,TN,FN = computeTP(pred, family)
     
-    return TP/(TP+FP)
+    pre = 0
+    if TP + FP != 0:
+        pre = TP/(TP+FP)
+    
+    return pre
 
 def compute_sensitivity(family:np.array, pred: np.array):
     """ Compute the sensitivity.
@@ -657,8 +661,6 @@ class EnsemblingHierarchical(ClusterMixin, BaseEstimator):
             if (self.ensembling_ != 'voting'):
                 pred = [np.nan if x == 0 else x for x in pred]
             clustering.append(pred)
-            
-        print(np.array(clustering).shape)
             
         #Get the final clustering from the individual clustering result
         if self.ensembling_ == 'voting':
