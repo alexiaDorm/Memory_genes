@@ -748,3 +748,96 @@ def subsampling_genes(subset:np.array, N:int, p_mutate:float):
         subsets[i] = subsets[i].astype(bool)
         
     return subsets
+
+def getTrainTestAll(y:np.array, x:np.array, ind_dataset:list, i:int):
+    """Split the merged data, one data set is keept for testing, the others for training.
+  
+      parameters:
+      y : np.array,
+        family of each data points
+      x : np.array,
+        features of each data points
+      ind_dataset : list,
+        list of indices where each data set is stored
+      i: int, 
+        ind of the data set to keep for testing
+        
+
+      returns:
+      x_train : np.array,
+        norm data without the test dataset for training
+      y_train : np.array,
+        families of each data point without the test dataset for training
+      x_test : np.array,
+        norm data of the test dataset
+      y_test : np.array,
+        families of each data point of the test dataset"""
+    
+    ind_i = None
+    if i == 0:
+        ind_i = np.arange(0,ind_dataset[i],1)
+    else:
+        ind_i = np.arange(ind_dataset[i-1], ind_dataset[i], 1)
+    
+    
+    x_train = np.delete(x, ind_i, axis=0)
+    y_train = np.delete(y, ind_i)
+    x_test = x[ind_i,:]
+    y_test = y[ind_i]
+    
+    return x_train, y_train, x_test, y_test
+
+
+def optimization_on_allsets(y:np.array, x:np.array, ind_dataset:list, Model_test: Callable, Scoring_test: Callable, maximize_test:bool, func: Callable, **kwargs: dict):
+    """ 
+  
+      parameters:
+      y : np.array,
+        family of each data points
+      x : np.array,
+        features of each data points
+      ind_dataset : list,
+        list of indices where each data set is stored
+      Model_test : Callable,
+        the model is fitted using this method
+      Scoring_test: Callable,
+        scoring function use to evaluate the model
+      maximize_test: bool,
+        if True the scoring function is maximize, else it is minimize
+      func: Callable,
+        feature selection function, should return seleted subset and associated score
+      kwargs: **kwargs : dict,
+        dictionnary of parameters and their values (kwargs = {'param_name' : value}) to pass to the given method (func)
+        
+
+      returns:
+      final_subset : np.array,
+        subset of features with the best score
+      best_test_score : float,
+        test score obtained with the best subset of features """
+    
+    #Store score training and best subset
+    score_training = []
+    score_testing = []
+    final_subset = []
+    
+    for i in range(0,len(ind_dataset)):
+        #Get split data
+        x_train, y_train, x_test, y_test = getTrainTestAll(y, x, ind_dataset, i)
+        print(y.shape, y_train.shape, y_test.shape)
+        print(x.shape, x_train.shape, x_test.shape)
+        
+        #Run feature selection on training set
+        subset, score = func(y_train, x_train, **kwargs)
+        
+        #Evaluate subset on test set
+        model_test = Model_test(np.unique(y_test),Scoring_test,True)
+        pred_test = model_test.fit_predict(x_test[:, subset],y_test)
+        test_score = model_test.score(x_test[:, subset],y_test)
+        
+        #Store best score and best subset on current folds
+        score_training.append(score)
+        score_testing.append(test_score)
+        final_subset.append(subset)
+        
+    return final_subset, score_training, score_testing
