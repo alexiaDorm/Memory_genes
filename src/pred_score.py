@@ -108,7 +108,7 @@ class FamiliesClusters(ClusterMixin, BaseEstimator):
         self.n_clusters_, self.labels_, self.score_ = N, clustering, score
         return self
     
-    def fit_predict(self, X:np.array, y:np.array,NmaxCluster:int = None):
+    def fit_predict(self, X:np.array, y:np.array=None,NmaxCluster:int = None):
         self.fit(X,y,NmaxCluster)
         
         return self.labels_      
