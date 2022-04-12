@@ -21,8 +21,6 @@ module load gcc/9.3.0
 module load python
 
 pwd
-WORKING_DIR = "/home/dormann/Memory_genes/src"
-cd "$WORKING_DIR"
 
 srun python 'mixdata.py' $norm_path
  
