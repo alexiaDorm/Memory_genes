@@ -8,7 +8,7 @@
 echo STARTING AT `date`
 
 module load gcc 
-module load phython
+module load python
 
 srun python mixdata.py
  
