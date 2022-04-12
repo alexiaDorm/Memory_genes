@@ -40,7 +40,7 @@ All of them need to be installed by the user beforehand. This can be done simply
 ```sh
    git clone https://github.com/CS-433/ml-project-2-ati
    ```
-3. Download the data from this address: https://drive.google.com/drive/folders/1xxONi388bhkJneT1JrNE7K9soaMtorS1?usp=sharing. Placed it at the same level as the src folder in a folder named "data". Note that to have access to the data the user needs to be connected to the Google services with their epfl address.
+3. Download the data from this address:  Placed it at the same level as the src folder in a folder named "data". Note that to have access to the data the user needs to be connected to the Google services with their epfl address.
 4. Run the generate_csv notebook to generate the processed data sets.
 5. The optimization of each data set is done in different notebooks, that can be run to generate the optimal genes set files. These files are also provided on the drive as running this notebooks can take some time.
 6. Run the overlap notebook to determine the final optimal memory gene set accross data sets.
