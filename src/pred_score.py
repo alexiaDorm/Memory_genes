@@ -3,11 +3,8 @@ import pandas as pd
 import sklearn
 import math 
 from typing import AnyStr, Callable, Tuple
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import KFold
 from sklearn.base import ClusterMixin,BaseEstimator
 from scipy.cluster.hierarchy import ward, cut_tree
-from sklearn.metrics import make_scorer
 from scipy_cut_tree_balanced import cut_tree_balanced
 
 from Wrapper_FS import mutate
