@@ -18,9 +18,13 @@ norm_path='../data/processed_data/AE3.csv'
 echo STARTING AT `date`
 
 module load gcc/9.3.0
-module load python/3.7.7
+module load python
 
-srun python mixdata.py norm_path
+pwd
+WORKING_DIR = "/home/dormann/Memory_genes/src"
+cd "$WORKING_DIR"
+
+srun python 'mixdata.py' $norm_path
  
 echo FINISHED at `date`
 
