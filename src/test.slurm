@@ -20,7 +20,7 @@ echo STARTING AT `date`
 module load gcc/9.3.0
 module load python
 
-srun python '/src/mixdata.py' $norm_path
+srun python mixdata.pys $norm_path
  
 echo FINISHED at `date`
 
