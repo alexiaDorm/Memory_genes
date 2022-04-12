@@ -17,7 +17,9 @@ norm_path='../data/processed_data/AE3.csv'
  
 echo STARTING AT `date`
 
-module load gcc/9.3.0
+      
+module load gcc/8.4.0
+module load intel/19.0.5
 module load python/3.7.7
 
 srun python mixdata.py $norm_path
