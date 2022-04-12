@@ -1,15 +1,26 @@
 #!/bin/bash -l
 
-#SBATCH --nodes 1-1
-#SBATCH --exclusive
-#SBATCH --mem 60000
-#SBATCH --time 00:05:00
+#SBATCH --job-name="test"
+#SBATCH --error="test%a.err"
+#SBATCH --output="test%a.out"
+#SBATCH --nodes 1
+#SBATCH --ntasks=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=1:00:00
+#SBATCH --chdir /scratch/dormann
+#SBATCH --mem 64G
+#SBATCH --mail-type=END
+#SBATCH --mail-user=alexia.dormann@epfl.ch
+
+norm_path='../data/processed_data/AE3.csv'
  
 echo STARTING AT `date`
 
-module load gcc 
-module load python
+module load gcc/9.3.0
+module load python/3.7.7
 
-srun python mixdata.py
+srun python mixdata.py norm_path
  
 echo FINISHED at `date`
+

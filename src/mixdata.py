@@ -4,7 +4,7 @@ import random
 import matplotlib.pyplot as plt
 import pandas as pd  
 from pred_score import *
-from filter_FS import MIM,ANOVA
+from Filter_FS import MIM,ANOVA
 import sys
 
 #Get input for script
