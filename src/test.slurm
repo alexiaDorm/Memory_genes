@@ -20,7 +20,8 @@ echo STARTING AT `date`
 module load gcc/9.3.0
 module load python
 
-cd /../home/Memory_genes/src
+pwd
+cd "/../home/Memory_genes/src"
 pwd
 
 srun python 'mixdata.py' $norm_path
