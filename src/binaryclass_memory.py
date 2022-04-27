@@ -43,8 +43,8 @@ def visualize_charac(data:pd.DataFrame):
     plt.title("Only memory genes")
     plt.show()
     
-def fit_logistic_reg(X:np.array, y:np.array):
-    clf = LogisticRegression(class_weight = 'balanced').fit(X,y)
+def fit_logistic_reg(X:np.array, y:np.array, penalty:str, lamb:float):
+    clf = LogisticRegression(penalty = penalty, C = lamb, class_weight = 'balanced').fit(X,y)
     scores = cross_val_score(clf, X, y, cv=5)
     
     return clf, scores.mean()
@@ -55,7 +55,7 @@ def fit_svm(X:np.array, y:np.array, kernel = 'linear'):
     
     return clf, scores.mean()
 
-def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, fit_func:str, feat:list, kernel:str=None, verbose:bool=True):
+def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, fit_func:str, feat:list, penalty:str =None, lamb:float=None, kernel:str=None, verbose:bool=True):
     data_charac = data_charac.dropna(subset=['skew_residuals', 'mean_expression'])
     X = np.array(data_charac.iloc[: , feat])
     #X[:,-1] = np.log10(X[:,-1]) #log scale for mean expression
@@ -63,7 +63,7 @@ def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, f
     
     #Fit classifier to charac data
     if fit_func == 'logreg':
-        clf, score = fit_logistic_reg(X, Y)
+        clf, score = fit_logistic_reg(X, Y, penalty, lamb)
     if fit_func == 'svm':
         clf, score = fit_svm(X, Y, kernel)
 
