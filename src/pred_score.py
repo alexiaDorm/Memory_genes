@@ -90,7 +90,7 @@ class FamiliesClusters(ClusterMixin, BaseEstimator):
         onecell_family = values[np.where(counts==1)]
         for fam in onecell_family:
             clustering[clustering == fam] = 0
-        
+
         self.recovery = compute_recovery(clustering)
     
         #Score the cluster and determine the number of clusters
@@ -315,8 +315,9 @@ def evaluate(y:np.array, x:np.array, Model:Callable, Scoring: Callable, maximize
     model = Model(np.unique(y),Scoring,maximize)
     pred = model.fit_predict(x,y)
     score = model.score_
+    recovery = model.recovery
 
-    return score
+    return score, recovery
 
 #---------------------------------------------------------------------------------------------------------------
 #Repetitive clustering

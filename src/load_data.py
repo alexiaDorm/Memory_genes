@@ -189,3 +189,127 @@ def compare_feat_files(data_sets : list, cond_FM: np.array, p_val : float = 0.05
         nbrs_good[i] = tab.sum()    #number of good features
 
     return nbrs_good, tab_good
+
+def read_charac_output(file_path:str):
+    #Read .txt file 
+    lines = []
+    with open(file_path) as f:
+        lines = f.readlines()
+
+    #Get the name of the column on first line
+    colnames = lines[0].split("\t")
+    colnames[-1] = colnames[-1][0:-1]
+    colnames = [name.strip('"') for name in colnames]
+    #Get data in rest of line
+    for i in range (1,len(lines)):
+            
+        lines[i] = lines[i].split("\t")
+        #Remove double quote around gene name
+        lines[i][1] = lines[i][1].strip('"')
+        #Remplace 'NA' by float np.NAN
+        ind = np.squeeze(np.where([(i == 'NA' or i == 'NA\n') for i in lines[i]]))
+        if ind.size == 1:
+            lines[i][ind] = np.NAN
+        elif ind.size > 1:
+            for j in ind:
+                lines[i][j] = np.NAN
+                
+        lines[i][2:8] = [float(i) for i in lines[i][2:8]]
+        lines[i] = lines[i][1:8]
+    
+    #Define a pandas DataFrame with all the data
+    data = pd.DataFrame(lines[1:],columns=colnames)
+    data = data.set_index(colnames[0])
+    
+    return data
+
+def read_memory_genes(file_path:str):
+    #Read .txt file 
+    lines = []
+    with open(file_path) as f:
+        lines = f.readlines()
+
+    #Get data in rest of line
+    NA_val = 'NA\n'
+    for i in range (1,len(lines)):
+        lines[i] = lines[i].split("\t")
+
+        #Remplace 'NA' by float np.NAN
+        ind = np.squeeze(np.where([i == NA_val for i in lines[i]]))
+        if ind.size > 0:
+            lines[i][ind] = np.NAN
+        
+        lines[i][1] = float(lines[i][1])
+    
+    #Define a pandas DataFrame with all the data
+    data = pd.DataFrame(lines[1:])
+    data = data.set_index(0)
+    
+    return data
+
+def get_memory_genes (memory_pvalue:pd.DataFrame):
+    
+    return list(memory_pvalue.index[np.where(memory_pvalue <= 0.05)[0]])
+
+def open_charac(charac_output_path:str, p_value_path:str, k:float, general_charac:pd.DataFrame=None):
+    
+    #Load data
+    charac = read_charac_output(charac_output_path)
+    memory = read_memory_genes(p_value_path)
+    memory_genes = get_memory_genes(memory) 
+    
+    #Add to characterectics matrix if gene is a memory gene as bool
+    memory_bin = np.zeros((len(charac),))
+    memory_bin[np.where([gene in memory_genes for gene in list(charac.index)])] = 1
+    memory_bin = [bool(mem) for mem in memory_bin]
+
+    charac['memory_gene'] = memory_bin
+    
+    #Remove the extreme mean_expression values
+    outliers = []
+    #charac, outliers = remove_extreme_values(charac, k)
+    #Normalize skew + mean expression to range (0,100)
+    #charac['skew'] = normalize(charac['skew'])
+    #charac['skew_residuals'] = normalize(charac['skew_residuals'])
+    #charac['mean_expression'] = normalize(charac['mean_expression'])
+
+    #Add general characteristics to charac matrix
+    if general_charac != None:
+        1 #TO ADD
+    
+    return charac, outliers
+
+def normalize(data:np.array):
+    #Normlize into 0 to 100 range
+    return ((data - min(data))/ (max(data) - min(data))) * 100
+
+def remove_extreme_values(data:pd.DataFrame, k:float=3):
+    '''Remove all extreme values of gene expression using Interquartile Range Method. Return the name of the gene with extreme values.
+    
+    parameters:
+    ---------------
+    data:pd.DataFrame,
+        characteristic matrix NxM with N, number of genes and M, the number of characteristics
+    k:float,
+        constant to determine the cut-off of values to remove.
+        
+    return:
+    -------------
+    outliers_removed:pd.DataFrame,
+        data without outliers 
+    outliers_gene: list,
+        list of the gene with extreme mean expression values
+    '''
+    q25, q75 = np.percentile(data["mean_expression"], 25), np.percentile(data["mean_expression"], 75)
+    iqr = q75 - q25
+    cut_off = iqr * k
+    lower, upper = q25 - cut_off, q75 + cut_off
+    
+    # identify outliers
+    outliers =  list(data.iloc[np.where([x>upper for x in data["mean_expression"]])[0]].index)
+    not_outliers = np.where([x<upper for x in data["mean_expression"]])[0]
+    # remove outliers
+    data = data.iloc[not_outliers]
+                                                                        
+    return data, outliers
+    

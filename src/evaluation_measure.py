@@ -233,7 +233,7 @@ def compute_frac_each_family_same_cluster(family:np.array, pred: np.array):
     
     return np.mean(frac)
 
-def compute_recovery(final_label:np.array):
+def compute_recovery(final_label:np.array = None):
     '''Compute the recovery of the clustring
         parameters:
         -------
