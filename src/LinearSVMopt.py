@@ -69,9 +69,7 @@ pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecLinearSVM/
 
 #Grid search of penalty values
 #L2 regularization
-plot = True
-best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecLinearSVM/bestFeat.csv')
-best_feat = np.array(best_feat.set_index('Unnamed: 0'))
+plot = False
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
 feat = [4,5]
 
