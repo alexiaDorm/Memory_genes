@@ -65,7 +65,7 @@ for i, data in enumerate(charac_matrix):
     indices_max.append(feat_sets[ind_max])
     
     
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecLinearSVM/bestFeat.csv', index=True)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecLinearSVM/bestFeat.csv', index=False)
 
 #Grid search of penalty values
 #L2 regularization
@@ -73,13 +73,14 @@ plot = True
 best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecLinearSVM/bestFeat.csv')
 best_feat = np.array(best_feat.set_index('Unnamed: 0'))
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
+feat = [4,5]
 
 indices_max = []
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = best_feat[i], lamb = lamb, kernel = 'linear', verbose =False))
+        scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = feat, lamb = lamb, kernel = 'linear', verbose =False))
     
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/RegLinearSVM/' + names[i] + '.csv', index=True)
@@ -99,4 +100,4 @@ for i, data in enumerate(charac_matrix):
         plt.show()
         print('------')  
 
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegLinearSVM/bestFeat.csv', index=True)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegLinearSVM/bestFeat.csv', index=False)
