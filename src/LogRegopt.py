@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import sklearn
 import pyreadr
 
-from ../load_data import open_charac
-from ../binaryclass_memory import *
+from load_data import open_charac
+from binaryclass_memory import *
 import sys
 
 #Set the seed for reproducibility
