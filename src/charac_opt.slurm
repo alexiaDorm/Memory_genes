@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="LinearSVM"
-#SBATCH --error="linearSVM%a.err"
-#SBATCH --output="linearSVM%a.out"
+#SBATCH --job-name="logSVM"
+#SBATCH --error="log.err"
+#SBATCH --output="log.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python LinearSVMopt.py 
+srun python LogRegopt.py 
  
 echo FINISHED at `date`
 
