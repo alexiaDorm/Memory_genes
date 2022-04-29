@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="rbf"
-#SBATCH --error="rbf%a.err"
-#SBATCH --output="rbf%a.out"
+#SBATCH --job-name="logis"
+#SBATCH --error="logis%a.err"
+#SBATCH --output="logis%a.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
