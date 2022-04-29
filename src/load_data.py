@@ -270,10 +270,6 @@ def open_charac(charac_output_path:str, p_value_path:str, k:float, general_chara
     #Remove the extreme mean_expression values
     outliers = []
     #charac, outliers = remove_extreme_values(charac, k)
-
-    #Add general characteristics to charac matrix
-    if general_charac != None:
-        charac = add_general_charac(charac, general_charac)
         
     #Add to characterectics matrix if gene is a memory gene as bool
     memory_bin = np.zeros((len(charac),))
