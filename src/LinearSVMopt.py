@@ -76,9 +76,10 @@ scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering reco
 indices_max = []
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
+    feat = best_feat[i][~np.isnan(best_feat[i])]
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = best_feat[i], lamb = lamb, kernel = 'linear', verbose =False))
+        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, lamb = lamb, kernel = 'linear', verbose =False))
     
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/RegLinearSVM/' + names[i] + '.csv', index=True)

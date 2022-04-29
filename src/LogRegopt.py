@@ -44,7 +44,7 @@ for name in names:
     norm_matrix.append(norm)
     families_matrix.append(families)
     
-'''#Feature selection with highest clustering precision + recovery
+#Feature selection with highest clustering precision + recovery
 indices_max = []
 for i, data in enumerate(charac_matrix):
     feat_sets =[[4,5],[3,5],[1,5],[2,5],[1,2,5],[3,4,5],[1,3,5],[2,4,5],[1,2,3,4,5]]
@@ -63,7 +63,7 @@ for i, data in enumerate(charac_matrix):
     ind_max = np.squeeze(np.argmax(np.array(scores_df['Clustering precision'])))
     indices_max.append(feat_sets[ind_max])
     
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSeleclogreg/' + 'bestFeat' + '.csv', index=True)'''
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSeleclogreg/' + 'bestFeat' + '.csv', index=False)
 
 #Grid search of penalty values
 #L2 regularization
@@ -76,9 +76,10 @@ scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering reco
 indices_max = []
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
+    feat = best_feat[i][~np.isnan(best_feat[i])]
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'logreg', best_feat[i], penalty = 'l2', lamb = lamb, verbose = False))
+        scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'logreg', feat, penalty = 'l2', lamb = lamb, verbose = False))
     
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/L2reglogreg/' + names[i] + '.csv', index=True)
@@ -97,4 +98,4 @@ for i, data in enumerate(charac_matrix):
         plt.show()
         print('------')  
         
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/L2reglogreg/bestFeat.csv', index=True)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/L2reglogreg/bestFeat.csv', index=False)

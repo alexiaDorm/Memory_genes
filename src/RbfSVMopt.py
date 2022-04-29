@@ -65,7 +65,7 @@ for i, data in enumerate(charac_matrix):
     ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
     indices_max.append(feat_sets[ind_max])
     
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecRBFSVM/bestFeat.csv', index=True)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecRBFSVM/bestFeat.csv', index=False)
 
 #Grid search of penalty values
 #L2 regularization
@@ -76,9 +76,10 @@ scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering reco
 
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
+    feat = best_feat[i][~np.isnan(best_feat[i])]
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = best_feat[i], lamb = lamb, kernel = 'rbf', verbose =False))
+        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, lamb = lamb, kernel = 'rbf', verbose =False))
     
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/RegRBFSVM/' + names[i] + '.csv', index=True)
@@ -98,7 +99,7 @@ for i, data in enumerate(charac_matrix):
         plt.show()
         print('------')
         
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegRBFSVM/bestreg.csv', index=True)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegRBFSVM/bestreg.csv', index=False)
 
 #Grid search of gamma parameter for rbf kernel
 plot = False
@@ -111,9 +112,10 @@ scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering reco
 indices_max = []
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
+    feat = best_feat[i][~np.isnan(best_feat[i])]
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = best_feat[i], lamb = best_reg[i], kernel = 'rbf', gamma = lamb,  verbose =False))
+        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, lamb = best_reg[i], kernel = 'rbf', gamma = lamb,  verbose =False))
     
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/gammaRBFSVM/' + names[i] + '.csv', index=True)
@@ -133,4 +135,4 @@ for i, data in enumerate(charac_matrix):
         plt.show()
         print('------')
         
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/gammaRBFSVM/bestFeat.csv', index=True)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/gammaRBFSVM/bestFeat.csv', index=False)
