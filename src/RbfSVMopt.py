@@ -69,7 +69,7 @@ pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecRBFSVM/bes
 
 #Grid search of penalty values
 #L2 regularization
-plot = True
+plot = False
 best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecRBFSVM/bestFeat.csv')
 best_feat = np.array(best_feat.set_index('Unnamed: 0'))
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
@@ -101,7 +101,7 @@ for i, data in enumerate(charac_matrix):
 pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegRBFSVM/bestreg.csv', index=True)
 
 #Grid search of gamma parameter for rbf kernel
-plot = True
+plot = False
 best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecRBFSVM/bestFeat.csv')
 best_feat = np.array(best_feat.set_index('Unnamed: 0'))
 best_reg =  pd.read_csv('../data/binaryClass_scores/featSelecRBFSVM/bestreg.csv')

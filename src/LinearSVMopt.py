@@ -60,7 +60,6 @@ for i, data in enumerate(charac_matrix):
     scores_df.to_csv('../data/binaryClass_scores/featSelecLinearSVM/' + names[i] + '.csv', index=True)
     
     prec_rec = scores_df['Clustering precision'] + scores_df['Clustering recovery']
-    print(prec_rec)
     ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
     indices_max.append(feat_sets[ind_max])
     
@@ -69,7 +68,7 @@ pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecLinearSVM/
 
 Grid search of penalty values
 #L2 regularization
-plot = True
+plot = False
 best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecLinearSVM/bestFeat.csv')
 best_feat = np.array(best_feat.set_index('Unnamed: 0'))
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
