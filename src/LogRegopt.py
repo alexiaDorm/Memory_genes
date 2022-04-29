@@ -97,4 +97,4 @@ for i, data in enumerate(charac_matrix):
         plt.show()
         print('------')  
         
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegLinearSVM/bestFeat.csv', index=True)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/L2reglogreg/bestFeat.csv', index=True)
