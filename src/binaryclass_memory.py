@@ -11,6 +11,7 @@ from pred_score import *
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
 def visualize_charac(data:pd.DataFrame):
@@ -49,13 +50,13 @@ def fit_logistic_reg(X:np.array, y:np.array, penalty:str, lamb:float, solver:str
     
     return clf, scores.mean()
 
-def fit_svm(X:np.array, y:np.array, kernel = 'linear'):
-    clf = SVC(kernel = kernel, class_weight = 'balanced').fit(X,y)
+def fit_svm(X:np.array, y:np.array, lamb:float= 1, kernel:str = 'linear', degree:int = 3, gamma:int='scale'):
+    clf = SVC(C=lamb, kernel = kernel, degree = degree, gamma = gamma, class_weight = 'balanced').fit(X,y)
     scores = cross_val_score(clf, X, y, cv=5)
     
     return clf, scores.mean()
 
-def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, fit_func:str, feat:list, penalty:str =None, lamb:float=None, solver:str='lbfgs', kernel:str=None, verbose:bool=True):
+def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, fit_func:str, feat:list, penalty:str =None, lamb:float=1, solver:str='lbfgs', kernel:str='rbf', degree:int=3, gamma:int='scale', verbose:bool=True):
     data_charac = data_charac.dropna(subset=['skew_residuals', 'mean_expression'])
     X = np.array(data_charac.iloc[: , feat])
     #X[:,-1] = np.log10(X[:,-1]) #log scale for mean expression
@@ -65,7 +66,7 @@ def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, f
     if fit_func == 'logreg':
         clf, score = fit_logistic_reg(X, Y, penalty, lamb, solver)
     if fit_func == 'svm':
-        clf, score = fit_svm(X, Y, kernel)
+        clf, score = fit_svm(X, Y, lamb, kernel, degree, gamma)
 
     #Evaluate fitted classifier
     y = clf.predict(X)
