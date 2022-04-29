@@ -59,7 +59,6 @@ def fit_svm(X:np.array, y:np.array, lamb:float= 1, kernel:str = 'linear', degree
 def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, fit_func:str, feat:list, penalty:str =None, lamb:float=1, solver:str='lbfgs', kernel:str='rbf', degree:int=3, gamma:int='scale', verbose:bool=True):
     data_charac = data_charac.dropna(subset=['skew_residuals', 'mean_expression'])
     X = np.array(data_charac.iloc[: , feat])
-    #X[:,-1] = np.log10(X[:,-1]) #log scale for mean expression
     Y = np.array(data_charac['memory_gene'])
     
     #Fit classifier to charac data

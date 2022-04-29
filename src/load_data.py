@@ -251,31 +251,36 @@ def get_memory_genes (memory_pvalue:pd.DataFrame):
     
     return list(memory_pvalue.index[np.where(memory_pvalue <= 0.05)[0]])
 
-def open_charac(charac_output_path:str, p_value_path:str, k:float, general_charac:pd.DataFrame=None):
+def add_general_charac(charac:pd.DataFrame, general_charac:pd.DataFrame):
+    genes_interest = set(charac.index).intersection(list(general_charac.index))
+    general = general_charac.loc[genes_interest]
+    general = general.drop(columns=['gene_ID', 'transcript_ID', 'name', 'chr', 'start', 'end', 'TSS', 'strand'])
+    
+    charac = pd.concat([charac,general], axis=1)
+   
+    return charac
+
+def open_charac(charac_output_path:str, p_value_path:str, k:float, general_charac:pd.DataFrame=):
     
     #Load data
     charac = read_charac_output(charac_output_path)
     memory = read_memory_genes(p_value_path)
     memory_genes = get_memory_genes(memory) 
-    
+
+    #Remove the extreme mean_expression values
+    outliers = []
+    #charac, outliers = remove_extreme_values(charac, k)
+
+    #Add general characteristics to charac matrix
+    if general_charac != None:
+        charac = add_general_charac(charac, general_charac)
+        
     #Add to characterectics matrix if gene is a memory gene as bool
     memory_bin = np.zeros((len(charac),))
     memory_bin[np.where([gene in memory_genes for gene in list(charac.index)])] = 1
     memory_bin = [bool(mem) for mem in memory_bin]
-
-    charac['memory_gene'] = memory_bin
     
-    #Remove the extreme mean_expression values
-    outliers = []
-    #charac, outliers = remove_extreme_values(charac, k)
-    #Normalize skew + mean expression to range (0,100)
-    #charac['skew'] = normalize(charac['skew'])
-    #charac['skew_residuals'] = normalize(charac['skew_residuals'])
-    #charac['mean_expression'] = normalize(charac['mean_expression'])
-
-    #Add general characteristics to charac matrix
-    if general_charac != None:
-        1 #TO ADD
+    charac['memory_gene'] = memory_bin
     
     return charac, outliers
 
