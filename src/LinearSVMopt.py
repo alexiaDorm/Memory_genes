@@ -1,6 +1,7 @@
 #Import library
 import numpy as np
 import pandas as pd
+import random
 import matplotlib
 import matplotlib.pyplot as plt
 import sklearn
