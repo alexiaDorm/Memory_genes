@@ -44,8 +44,7 @@ for name in names:
     norm_matrix.append(norm)
     families_matrix.append(families)
     
-#Feature selection with highest clustering precision + recovery
-##Select the features with highest clustering precision
+#Select the features with highest clustering precision
 indices_max = []
 for i, data in enumerate(charac_matrix):
     feat_sets =[[4,5],[3,5],[1,5],[2,5],[1,2,5],[3,4,5],[1,3,5],[2,4,5],[1,2,3,4,5]]
@@ -55,7 +54,7 @@ for i, data in enumerate(charac_matrix):
     
     score_sets = []
     for feat in feat_sets:
-        score_sets.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, kernel = 'rbf', verbose =False))
+        score_sets.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = feat, kernel = 'rbf', verbose =False))
 
     scores_df = pd.DataFrame(score_sets, index = name_feat, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/featSelecRBFSVM/' + names[i] + '.csv', index=True)
@@ -70,24 +69,22 @@ pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecRBFSVM/bes
 #Grid search of penalty values
 #L2 regularization
 plot = False
-best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecRBFSVM/bestFeat.csv')
-best_feat = np.array(best_feat.set_index('Unnamed: 0'))
+feat = [4,5]
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
 
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
-    feat = best_feat[i][~np.isnan(best_feat[i])]
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, lamb = lamb, kernel = 'rbf', verbose =False))
+        scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = feat, lamb = lamb, kernel = 'rbf', verbose =False))
     
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/RegRBFSVM/' + names[i] + '.csv', index=True)
     
     #Get best best reg indices
     prec_rec = scores_df['Clustering precision'] + scores_df['Clustering recovery']
-    ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
-    indices_max.append(C[ind_max])
+    ind_max = np.max(np.array(prec_rec))
+    indices_max.append(ind_max)
     
     if plot:
         print(names[i])
@@ -103,27 +100,24 @@ pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegRBFSVM/bestreg.c
 
 #Grid search of gamma parameter for rbf kernel
 plot = False
-best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecRBFSVM/bestFeat.csv')
-best_feat = np.array(best_feat.set_index('Unnamed: 0'))
+feat = [4,5]
 best_reg =  pd.read_csv('../data/binaryClass_scores/featSelecRBFSVM/bestreg.csv')
-best_reg = np.array(best_reg.set_index('Unnamed: 0'))
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
 
 indices_max = []
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
-    feat = best_feat[i][~np.isnan(best_feat[i])]
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, lamb = best_reg[i], kernel = 'rbf', gamma = lamb,  verbose =False))
+        scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = feat, lamb = best_reg[i], kernel = 'rbf', gamma = lamb,  verbose =False))
     
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/gammaRBFSVM/' + names[i] + '.csv', index=True)
     
     #Get best best gamma indices
     prec_rec = scores_df['Clustering precision'] + scores_df['Clustering recovery']
-    ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
-    indices_max.append(C[ind_max])
+    ind_max = np.max(np.array(prec_rec))
+    indices_max.append(ind_max)
     
     if plot:
         print(names[i])
