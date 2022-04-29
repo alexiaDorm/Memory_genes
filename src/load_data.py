@@ -260,7 +260,7 @@ def add_general_charac(charac:pd.DataFrame, general_charac:pd.DataFrame):
    
     return charac
 
-def open_charac(charac_output_path:str, p_value_path:str, k:float, general_charac:pd.DataFrame=None):
+def open_charac(charac_output_path:str, p_value_path:str, k:float):
     
     #Load data
     charac = read_charac_output(charac_output_path)
