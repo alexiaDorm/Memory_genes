@@ -66,7 +66,7 @@ for i, data in enumerate(charac_matrix):
     
 pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecLinearSVM/bestFeat.csv', index=True)
 
-Grid search of penalty values
+#Grid search of penalty values
 #L2 regularization
 plot = False
 best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecLinearSVM/bestFeat.csv')
