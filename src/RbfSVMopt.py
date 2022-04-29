@@ -45,7 +45,7 @@ for name in names:
     families_matrix.append(families)
     
 #Feature selection with highest clustering precision + recovery
-Select the features with highest clustering precision
+##Select the features with highest clustering precision
 indices_max = []
 for i, data in enumerate(charac_matrix):
     feat_sets =[[4,5],[3,5],[1,5],[2,5],[1,2,5],[3,4,5],[1,3,5],[2,4,5],[1,2,3,4,5]]
