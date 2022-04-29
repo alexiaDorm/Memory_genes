@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python LogRegopt.py 
+srun python LinearSVMopt.py 
  
 echo FINISHED at `date`
 
