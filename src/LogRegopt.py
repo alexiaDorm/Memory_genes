@@ -44,7 +44,7 @@ for name in names:
     norm_matrix.append(norm)
     families_matrix.append(families)
     
-#Feature selection with highest clustering precision + recovery
+#Select the features with highest clustering precision
 indices_max = []
 for i, data in enumerate(charac_matrix):
     feat_sets =[[4,5],[3,5],[1,5],[2,5],[1,2,5],[3,4,5],[1,3,5],[2,4,5],[1,2,3,4,5]]
@@ -57,7 +57,7 @@ for i, data in enumerate(charac_matrix):
         score_sets.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'logreg', feat, penalty = 'l2', lamb = 1, verbose = False))
 
     scores_df = pd.DataFrame(score_sets, index = name_feat, columns= scores)
-    scores_df.to_csv('../data/binaryClass_scores/featSeleclogreg/' + names[i] + 'logreg.csv', index=True)
+    scores_df.to_csv('../data/binaryClass_scores/featSelecLogreg/' + names[i] + 'logreg.csv', index=True)
     
     #Get best features indices
     ind_max = np.squeeze(np.argmax(np.array(scores_df['Clustering precision'])))
@@ -69,14 +69,13 @@ pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSeleclogreg/' +
 #L2 regularization
 plot = False
 best_feat =  pd.read_csv('../data/binaryClass_scores/featSeleclogreg/' + 'bestFeat' + '.csv')
-print(best_feat)
 best_feat = np.array(best_feat.set_index('Unnamed: 0'))
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
+feat = [4,5]
 
 indices_max = []
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
-    feat = best_feat[i][~np.isnan(best_feat[i])]
     scores_grid = []
     for lamb in C:
         scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'logreg', feat, penalty = 'l2', lamb = lamb, verbose = False))
@@ -98,4 +97,4 @@ for i, data in enumerate(charac_matrix):
         plt.show()
         print('------')  
         
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/L2reglogreg/bestFeat.csv', index=False)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegLinearSVM/bestFeat.csv', index=False)

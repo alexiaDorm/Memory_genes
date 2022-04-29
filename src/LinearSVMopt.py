@@ -44,7 +44,7 @@ for name in names:
     norm_matrix.append(norm)
     families_matrix.append(families)
     
-#Feature selection with highest clustering precision + recovery
+#Select the features with highest clustering precision
 indices_max = []
 for i, data in enumerate(charac_matrix):
     feat_sets =[[4,5],[3,5],[1,5],[2,5],[1,2,5],[3,4,5],[1,3,5],[2,4,5],[1,2,3,4,5]]
@@ -54,12 +54,13 @@ for i, data in enumerate(charac_matrix):
     
     score_sets = []
     for feat in feat_sets:
-        score_sets.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, kernel = 'linear', verbose =False))
-
+        score_sets.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = feat, kernel = 'linear', verbose =False))
+        
     scores_df = pd.DataFrame(score_sets, index = name_feat, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/featSelecLinearSVM/' + names[i] + '.csv', index=True)
     
     prec_rec = scores_df['Clustering precision'] + scores_df['Clustering recovery']
+    print(prec_rec)
     ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
     indices_max.append(feat_sets[ind_max])
     
@@ -68,7 +69,7 @@ pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecLinearSVM/
 
 #Grid search of penalty values
 #L2 regularization
-plot = False
+plot = True
 best_feat =  pd.read_csv('../data/binaryClass_scores/featSelecLinearSVM/bestFeat.csv')
 best_feat = np.array(best_feat.set_index('Unnamed: 0'))
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
@@ -76,10 +77,9 @@ scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering reco
 indices_max = []
 for i, data in enumerate(charac_matrix):
     C = np.logspace(-10, 3, 14)
-    feat = best_feat[i][~np.isnan(best_feat[i])]
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(charac_matrix[0][0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, lamb = lamb, kernel = 'linear', verbose =False))
+        scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = best_feat[i], lamb = lamb, kernel = 'linear', verbose =False))
     
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
     scores_df.to_csv('../data/binaryClass_scores/RegLinearSVM/' + names[i] + '.csv', index=True)
