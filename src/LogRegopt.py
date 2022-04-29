@@ -44,7 +44,7 @@ for name in names:
     norm_matrix.append(norm)
     families_matrix.append(families)
     
-#Feature selection with highest clustering precision + recovery
+'''#Feature selection with highest clustering precision + recovery
 indices_max = []
 for i, data in enumerate(charac_matrix):
     feat_sets =[[4,5],[3,5],[1,5],[2,5],[1,2,5],[3,4,5],[1,3,5],[2,4,5],[1,2,3,4,5]]
@@ -63,12 +63,13 @@ for i, data in enumerate(charac_matrix):
     ind_max = np.squeeze(np.argmax(np.array(scores_df['Clustering precision'])))
     indices_max.append(feat_sets[ind_max])
     
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSeleclogreg/' + 'bestFeat' + '.csv', index=True)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSeleclogreg/' + 'bestFeat' + '.csv', index=True)'''
 
 #Grid search of penalty values
 #L2 regularization
 plot = False
 best_feat =  pd.read_csv('../data/binaryClass_scores/featSeleclogreg/' + 'bestFeat' + '.csv')
+print(best_feat)
 best_feat = np.array(best_feat.set_index('Unnamed: 0'))
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
 
