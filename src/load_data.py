@@ -252,7 +252,7 @@ def get_memory_genes (memory_pvalue:pd.DataFrame):
     return list(memory_pvalue.index[np.where(memory_pvalue <= 0.05)[0]])
 
 def add_general_charac(charac:pd.DataFrame, general_charac:pd.DataFrame):
-    genes_interest = set(charac.index).intersection(list(general_charac.index))
+    genes_interest = (set(charac.index)).intersection(list(general_charac.index))
     general = general_charac.loc[genes_interest]
     general = general.drop(columns=['gene_ID', 'transcript_ID', 'name', 'chr', 'start', 'end', 'TSS', 'strand'])
     
@@ -266,10 +266,6 @@ def open_charac(charac_output_path:str, p_value_path:str, k:float):
     charac = read_charac_output(charac_output_path)
     memory = read_memory_genes(p_value_path)
     memory_genes = get_memory_genes(memory) 
-
-    #Remove the extreme mean_expression values
-    outliers = []
-    #charac, outliers = remove_extreme_values(charac, k)
         
     #Add to characterectics matrix if gene is a memory gene as bool
     memory_bin = np.zeros((len(charac),))
@@ -278,7 +274,7 @@ def open_charac(charac_output_path:str, p_value_path:str, k:float):
     
     charac['memory_gene'] = memory_bin
     
-    return charac, outliers
+    return charac
 
 def normalize(data:np.array):
     #Normlize into 0 to 100 range

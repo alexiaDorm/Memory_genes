@@ -1,13 +1,13 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="LinearSVM"
-#SBATCH --error="linear.err"
-#SBATCH --output="linear.out"
+#SBATCH --job-name="RbfSVM"
+#SBATCH --error="rbf.err"
+#SBATCH --output="rbf.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=24:00:00
+#SBATCH --time=2-5:00:00
 #SBATCH --chdir /scratch/dormann/Memory_genes/src
 #SBATCH --mem 64G
 #SBATCH --mail-type=END
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python LinearSVMopt.py 
+srun python RbfSVMopt.py 
  
 echo FINISHED at `date`
 
