@@ -73,7 +73,6 @@ def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, f
     memory_gene = list(data_charac[data_charac['memory_gene'] == True].index)
     y = pd.DataFrame(y, index = data_charac.index, columns = ['pred'])
     y['true_label'] = Y
-    print(memory_gene)
 
     y_non_mem = y.loc[non_memory_gene]
     y_mem = y.loc[memory_gene]
@@ -82,18 +81,22 @@ def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, f
     
     #Evaluate extracted subset on RNAseq Data
     gene_subset = list(y[y['pred']==True].index)
+    
+    if gene_subset:
+        norm_subset = np.array(norm.loc[gene_subset].T)
 
-    norm_subset = np.array(norm.loc[gene_subset].T)
+        model = FamiliesClusters(np.unique(family),compute_precision,True)
+        pred = model.fit_predict(norm_subset,family)
+        precision, recovery = model.score_, model.recovery
+    else:
+        precision, recovery = np.NaN, np.NaN
     
-    model = FamiliesClusters(np.unique(family),compute_precision,True)
-    pred = model.fit_predict(norm_subset,family)
-    
-    scores = [score, recovery, false_pos, model.score_, model.recovery]
+    scores = [score, recovery, false_pos, precision, recovery]
     
     if verbose:
         print('accuracy: ',score)
         print('recovery memory genes: ', recovery)
         print('false postive: ', false_pos)
-        print('Precision and recovery clustering: ',model.score_, model.recovery)
+        print('Precision and recovery clustering: ', precision, recovery)
         
     return scores
