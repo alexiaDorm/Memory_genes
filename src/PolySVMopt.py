@@ -43,28 +43,6 @@ for name in names:
     
     norm_matrix.append(norm)
     families_matrix.append(families)
-    
-#Select the features with highest clustering precision
-indices_max = []
-for i, data in enumerate(charac_matrix):
-    feat_sets =[[4,5],[3,5],[1,5],[2,5],[1,2,5],[3,4,5],[1,3,5],[2,4,5],[1,2,3,4,5]]
-    name_feat = [list(data[0].iloc[: , feat].columns) for feat in feat_sets] 
-    name_feat = [', '.join(names) for names in name_feat]
-    scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
-    
-    score_sets = []
-    for feat in feat_sets:
-        score_sets.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = feat, kernel = 'poly', verbose =False))
-        
-    scores_df = pd.DataFrame(score_sets, index = name_feat, columns= scores)
-    scores_df.to_csv('../data/binaryClass_scores/featSelecPolSVM/' + names[i] + '.csv', index=True)
-    
-    prec_rec = scores_df['Clustering precision'] + scores_df['Clustering recovery']
-    ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
-    indices_max.append(feat_sets[ind_max])
-    
-    
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSelecPolSVM/bestFeat.csv', index=False)
 
 #Grid search of penalty values and polynomial degree
 plot = False
@@ -72,21 +50,20 @@ feat = [4,5]
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
 
 C = np.logspace(-10, 3, 14)
-degree = np.arange(2,7,1)
+degree = np.arange(2,5,1)
 
 for d in degree:
-    for i, data in enumerate(charac_matrix):
-        scores_grid = []
-        for lamb in C:
-            scores_grid.append(fit_evaluate(data[0], norm_matrix[i], families_matrix[i], 'svm', feat = best_feat[i], lamb = lamb, kernel = 'poly', degree = d, verbose =False))
+    scores_grid = []
+    for lamb in C:
+        scores_grid.append(fit_evaluate(charac_matrix[0], norm_matrix[0], families_matrix[0], 'svm', feat, lamb = lamb, kernel = 'poly', degree = d, verbose =False))
 
-        scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
-        scores_df.to_csv('../data/binaryClass_scores/RegPolSVM/' + names[i] + str(d) + '.csv', index=False)
+    scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
+    scores_df.to_csv('../data/binaryClass_scores/RegPolSVM/' + names[i] + str(d) + '.csv', index=False)
 
-        #Get best best reg indices
-        prec_rec = scores_df['Clustering precision'] + scores_df['Clustering recovery']
-        ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
-        indices_max.append(C[ind_max])
+    #Get best best reg indices
+    prec_rec = scores_df['Clustering precision'] + scores_df['Clustering recovery']
+    ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
+    indices_max.append(C[ind_max])
 
         if plot:
             print(names[i])

@@ -73,6 +73,7 @@ def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, f
     memory_gene = list(data_charac[data_charac['memory_gene'] == True].index)
     y = pd.DataFrame(y, index = data_charac.index, columns = ['pred'])
     y['true_label'] = Y
+    print(memory_gene)
 
     y_non_mem = y.loc[non_memory_gene]
     y_mem = y.loc[memory_gene]
