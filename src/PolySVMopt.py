@@ -45,35 +45,16 @@ for name in names:
     families_matrix.append(families)
 
 #Grid search of penalty values and polynomial degree
-plot = False
-feat = [4,5]
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
 
+feat = [4,5]
 C = np.logspace(-10, 3, 14)
-degree = np.arange(2,5,1)
+degree = np.arange(2,8,1)
 
 for d in degree:
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(charac_matrix[0], norm_matrix[0], families_matrix[0], 'svm', feat, lamb = lamb, kernel = 'poly', degree = d, verbose =False))
+        scores_grid.append(fit_evaluate(charac_matrix[0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, lamb = lamb, kernel = 'poly', degree = d, verbose = False))
 
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
-    scores_df.to_csv('../data/binaryClass_scores/RegPolSVM/' + names[i] + str(d) + '.csv', index=False)
-
-    #Get best best reg indices
-    prec_rec = scores_df['Clustering precision'] + scores_df['Clustering recovery']
-    ind_max = np.squeeze(np.argmax(np.array(prec_rec)))
-    indices_max.append(C[ind_max])
-
-        if plot:
-            print(names[i])
-            plt.plot(C,scores_df['Clustering precision'])
-            plt.title('Grid search for C regularization parameter for L2 regulatization.')
-            plt.xlabel('regularization parameter, C')
-            plt.xscale('log')
-            plt.ylabel('clustering precision')
-            plt.show()
-            print('------')
-
-    pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegPolSVM/bestreg' + str(d) + '.csv', index=False)
-    
+    scores_df.to_csv('../data/binaryClass_scores/RegPolSVM/' + names[0] + 'Degree' + str(d) + '.csv', index=True)

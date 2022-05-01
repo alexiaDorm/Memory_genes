@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="RbfSVM"
-#SBATCH --error="rbf.err"
-#SBATCH --output="rbf.out"
+#SBATCH --job-name="polySVM"
+#SBATCH --error="poly.err"
+#SBATCH --output="poly.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python RbfSVMopt.py 
+srun python PolySVMopt.py 
  
 echo FINISHED at `date`
 
