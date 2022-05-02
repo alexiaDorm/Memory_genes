@@ -48,13 +48,20 @@ for name in names:
 scores = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
 
 feat = [4,5]
+d = 2
 C = np.logspace(-10, 3, 14)
-degree = np.arange(2,8,1)
 
-for d in degree:
+indices_max = []
+for i, data in enumerate(charac_matrix)
     scores_grid = []
     for lamb in C:
-        scores_grid.append(fit_evaluate(charac_matrix[0], norm_matrix[0], families_matrix[0], 'svm', feat = feat, lamb = lamb, kernel = 'poly', degree = d, verbose = False))
+        scores_grid.append(fit_evaluate(data, norm_matrix[i], families_matrix[i], 'svm', feat = feat, lamb = lamb, kernel = 'poly', degree = d, verbose = False))
 
     scores_df = pd.DataFrame(scores_grid, index = C, columns= scores)
-    scores_df.to_csv('../data/binaryClass_scores/RegPolSVM/' + names[0] + 'Degree' + str(d) + '.csv', index=True)
+    scores_df.to_csv('../data/binaryClass_scores/RegPolSVM/' + names[i] + 'Degree' + str(d) + '.csv', index=True)
+    
+    #Get best best reg indices
+    ind_max = np.squeeze(np.argmax(np.array(scores_df['Clustering precision']) + np.array(scores_df['Clustering recovery'])))
+    indices_max.append(C[ind_max])
+    
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/RegPolSVM/bestFeat.csv', index=False)
