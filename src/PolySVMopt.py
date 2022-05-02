@@ -52,7 +52,7 @@ d = 2
 C = np.logspace(-10, 3, 14)
 
 indices_max = []
-for i, data in enumerate(charac_matrix)
+for i, data in enumerate(charac_matrix):
     scores_grid = []
     for lamb in C:
         scores_grid.append(fit_evaluate(data, norm_matrix[i], families_matrix[i], 'svm', feat = feat, lamb = lamb, kernel = 'poly', degree = d, verbose = False))
