@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NND15_2"
-#SBATCH --error="NND15_2.err"
-#SBATCH --output="NND15_2.out"
+#SBATCH --job-name="NNAE3"
+#SBATCH --error="NNAE3.err"
+#SBATCH --output="NNAE3.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1

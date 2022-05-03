@@ -166,8 +166,8 @@ def objective(trial):
     
     #Open charac matrix
     general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
-    charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/BIDDY_D15_2__characteristics_output.txt'
-    p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_BIDDY_D15_2.txt'
+    charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/AE3__characteristics_output.txt'
+    p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_AE3.txt'
     data = open_charac(charac_out_path, p_value_path, 200)
     
     data = add_general_charac(data, general_charac)
