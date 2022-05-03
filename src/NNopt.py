@@ -13,3 +13,8 @@ torch.manual_seed(1)
 
 study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler())
 study.optimize(objective, n_trials=200)
+
+best_trial = study.best_trial
+
+for key, value in best_trial.params.items():
+    print("{}: {}".format(key, value))
