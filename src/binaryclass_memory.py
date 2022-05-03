@@ -168,6 +168,10 @@ def objective(trial):
     p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_AE3.txt'
     data = open_charac(charac_out_path, p_value_path, 200)
     
+    data = add_general_charac(data, general_charac)
+    charac_matrix[i] = data.drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
+    charac_matrix[i] = data.dropna()
+    
     accuracy = train_and_evaluate(params, model, data)
 
     return accuracy
