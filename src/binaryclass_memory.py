@@ -145,7 +145,9 @@ def compute_scores(network, inputs, targets):
     outputs[outputs >= 0.5] = 1
     outputs[outputs < 0.5] = 0
     targets, outputs = targets.detach().numpy(), outputs.detach().numpy()
-    recovery = np.sum(targets*outputs)/np.sum(targets)
+    recovery = 1
+    if np.sum(targets!= 0):
+        recovery = np.sum(targets*outputs)/np.sum(targets)
     FP = np.logical_and(outputs == 1, targets*outputs == 0)
     false_pos = np.sum(FP)
     
