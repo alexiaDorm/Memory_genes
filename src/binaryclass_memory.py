@@ -12,6 +12,12 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
+import os
+import torch
+from torch import nn
+from torch.utils.data import DataLoader, ConcatDataset
+from sklearn.model_selection import KFold
+import optuna
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
 def visualize_charac(data:pd.DataFrame):
@@ -100,3 +106,73 @@ def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, f
         print('Precision and recovery clustering: ', precision, recovery_clust)
         
     return scores
+
+#--------------------------------------------------------------------------------
+#A few functions for Neural network training
+class Dataset(torch.utils.data.Dataset):
+    'Characterizes a dataset for PyTorch'
+    def __init__(self, charac, labels):
+        'Initialization'
+        self.labels = labels
+        self.charac = charac
+
+    def __len__(self):
+        'Denotes the total number of samples'
+        return len(self.charac)
+
+    def __getitem__(self, index):
+        'Generates one sample of data'
+        # Select sample
+        X = self.charac[index]
+        y = self.labels[index]
+
+        return X, y
+
+def reset_weights(m):
+    '''Try resetting model weights to avoid weight leakage.'''
+    for layer in m.children():
+        if hasattr(layer, 'reset_parameters'):
+            layer.reset_parameters()
+            
+def compute_scores(network, inputs, targets):
+    #Compute prediction of network
+    outputs = torch.sigmoid(network(inputs))
+
+    #Compute accuracy
+    accuracy = ((outputs >= 0.5) == targets).float().mean()
+    #Compute recovery and false positive rate
+    outputs[outputs >= 0.5] = 1
+    outputs[outputs < 0.5] = 0
+    targets, outputs = targets.detach().numpy(), outputs.detach().numpy()
+    recovery = np.sum(targets*outputs)/np.sum(targets)
+    FP = np.logical_and(outputs == 1, targets*outputs == 0)
+    false_pos = np.sum(FP)
+    
+    return [accuracy, recovery, false_pos]
+
+def objective(trial):
+
+    params = {
+              'learning_rate': trial.suggest_loguniform('learning_rate', 1e-6, 1),
+              'n_fl': trial.suggest_int("n_fl", 4, 30),
+              'n_sl': trial.suggest_int("n_sl", 4, 30),
+              'batch_size': trial.suggest_int("batch_size", 32, 512, log=True)
+              }
+    
+    model = build_model(params)
+    
+    accuracy = train_and_evaluate(params, model)
+
+    return accuracy
+
+# Build neural network model
+def build_model(params):
+    
+    return nn.Sequential(
+        nn.Linear(18, params['n_fl']),
+        nn.ReLU(),
+        nn.Linear(params['n_fl'], params['n_sl']),
+        nn.ReLU(),
+        nn.Linear(params['n_sl'],1)
+        
+    )

@@ -44,7 +44,13 @@ for name in names:
     norm_matrix.append(norm)
     families_matrix.append(families)
     
-#Select the features with highest clustering precision
+#Add general characteristic
+for i in range(0,len(charac_matrix)):
+    charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
+    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'memory_gene', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
+    charac_matrix[i] = charac_matrix[i].dropna()
+    
+'''#Select the features with highest clustering precision
 indices_max = []
 for i, data in enumerate(charac_matrix):
     feat_sets =[[4,5],[3,5],[1,5],[2,5],[1,2,5],[3,4,5],[1,3,5],[2,4,5],[1,2,3,4,5]]
@@ -63,7 +69,7 @@ for i, data in enumerate(charac_matrix):
     ind_max = np.squeeze(np.argmax(np.array(scores_df['Clustering precision'])))
     indices_max.append(feat_sets[ind_max])
     
-pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSeleclogreg/' + 'bestFeat' + '.csv', index=False)
+pd.DataFrame(indices_max).to_csv('../data/binaryClass_scores/featSeleclogreg/' + 'bestFeat' + '.csv', index=False)'''
 
 #Grid search of penalty values
 #L2 regularization

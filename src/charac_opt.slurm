@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="polySVMDegree2"
-#SBATCH --error="poly.err"
-#SBATCH --output="poly.out"
+#SBATCH --job-name="NNAE3"
+#SBATCH --error="NNAE3.err"
+#SBATCH --output="NNAE3.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python PolySVMopt.py 
+srun python NNopt.py 
  
 echo FINISHED at `date`
 
