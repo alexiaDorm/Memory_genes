@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NND15_2"
-#SBATCH --error="NND15_2.err"s
-#SBATCH --output="NND15_2.out"
+#SBATCH --job-name="NNLSKmix"
+#SBATCH --error="NNLSKmix.err"
+#SBATCH --output="NNLSKmix.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
