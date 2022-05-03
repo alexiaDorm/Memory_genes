@@ -7,7 +7,7 @@ import pyreadr
 import math 
 from typing import AnyStr, Callable
 
-from load_data import open_charac
+from load_data import open_charac, add_general_charac
 from pred_score import *
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
