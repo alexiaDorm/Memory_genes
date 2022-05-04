@@ -7,7 +7,7 @@ import pyreadr
 import math 
 from typing import AnyStr, Callable
 
-from load_data import open_charac, add_general_charac
+from load_data import open_charac, add_general_charac, normalize
 from pred_score import *
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
@@ -24,14 +24,14 @@ import optuna
 def visualize_charac(data:pd.DataFrame):
     #Look at all genes
     colors = ['grey','red']
-    plt.scatter(data['skew'], data['mean_expression'], marker='o', c= data['memory_gene'], cmap=matplotlib.colors.ListedColormap(colors))
+    plt.scatter(data['skew'], normalize(data['mean_expression']), marker='o', c= data['memory_gene'], cmap=matplotlib.colors.ListedColormap(colors))
     plt.xlabel("skew")
     plt.ylabel("mean expression")
     plt.yscale('log')
     plt.title("All genes")
     plt.show()
     
-    #Only non memory genes
+    '''#Only non memory genes
     non_mem = list(data.index[np.where(data['memory_gene'] == False)[0]])
     data_non_mem = data.loc[non_mem]
     plt.scatter(data_non_mem['skew'], data_non_mem['mean_expression'])
@@ -49,7 +49,7 @@ def visualize_charac(data:pd.DataFrame):
     plt.ylabel("mean expression")
     plt.yscale('log')
     plt.title("Only memory genes")
-    plt.show()
+    plt.show()'''
     
 def fit_logistic_reg(X:np.array, y:np.array, penalty:str, lamb:float, solver:str='lbfgs'):
     clf = LogisticRegression(penalty = penalty, C = lamb, class_weight = 'balanced', solver =solver, max_iter=1000).fit(X,y)
@@ -141,6 +141,7 @@ def compute_scores(network, inputs, targets):
 
     #Compute accuracy
     accuracy = ((outputs >= 0.5) == targets).float().mean()
+    
     #Compute recovery and false positive rate
     outputs[outputs >= 0.5] = 1
     outputs[outputs < 0.5] = 0
@@ -275,11 +276,12 @@ def train_and_evaluate(param, model, data):
                 #Compute accuracy on testing fold
                 accuracy.append(compute_scores(network, inputs, targets))
 
-            # Store memory genes recovery
-            recovery = (100*np.nanmean(accuracy, axis = 0)[1])
-            FP_rate = (100*np.nanmean(accuracy, axis = 0)[2])
+            # Store memory genes recovery and FP
+            accuracy = np.array(accuracy)
+            recovery = 100* (np.nanmean(accuracy[:,1]))
+            FP_rate = np.NaN if np.all(accuracy[:,2]!=accuracy[:,2]) else 100* np.nanmean(accuracy[:,2])
             results.append(recovery - FP_rate)
             
-    mean_recovery = np.mean(results) #return the average memory genes recovery across folds
+    mean_recovery = np.nanmean(results) #return the average memory genes recovery across folds
 
     return mean_recovery
