@@ -145,13 +145,16 @@ def compute_scores(network, inputs, targets):
     outputs[outputs >= 0.5] = 1
     outputs[outputs < 0.5] = 0
     targets, outputs = targets.detach().numpy(), outputs.detach().numpy()
-    recovery = 1
-    if np.sum(targets!= 0):
-        recovery = np.sum(targets*outputs)/np.sum(targets)
-    FP = np.logical_and(outputs == 1, targets*outputs == 0)
-    false_pos = np.sum(FP)
     
-    return [accuracy, recovery, false_pos]
+    recovery, false_pos_rate = np.nan, np.nan
+    if np.sum(targets) != 0:
+        recovery = np.sum(targets*outputs)/np.sum(targets)
+        
+    FP = np.logical_and(outputs == 1, targets*outputs == 0)
+    if np.sum(outputs) != 0:
+        false_pos_rate = np.sum(FP)/np.sum(outputs)
+    
+    return [accuracy, recovery, false_pos_rate]
 
 def objective(trial):
 
@@ -165,9 +168,10 @@ def objective(trial):
     model = build_model(params)
     
     #Open charac matrix
+    name = 'AE3'
     general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
-    charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/AE3__characteristics_output.txt'
-    p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_AE3.txt'
+    charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + name + '__characteristics_output.txt'
+    p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + name + '.txt'
     data = open_charac(charac_out_path, p_value_path, 200)
     
     data = add_general_charac(data, general_charac)
@@ -272,7 +276,10 @@ def train_and_evaluate(param, model, data):
                 accuracy.append(compute_scores(network, inputs, targets))
 
             # Store memory genes recovery
-            results.append((100*np.mean(accuracy, axis = 0)[1]))
-            mean_recovery = np.mean(results)#return the average memory genes recovery across folds
+            recovery = (100*np.nanmean(accuracy, axis = 0)[1])
+            FP_rate = (100*np.nanmean(accuracy, axis = 0)[2])
+            results.append(recovery - FP_rate)
+            
+    mean_recovery = np.mean(results) #return the average memory genes recovery across folds
 
     return mean_recovery
