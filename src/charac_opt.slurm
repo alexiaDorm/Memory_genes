@@ -1,13 +1,13 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NNAE3"
-#SBATCH --error="NNAE3.err"
-#SBATCH --output="NNAE3.out"
+#SBATCH --job-name="NND15_2"
+#SBATCH --error="NND15_2.err"
+#SBATCH --output="NND15_2.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=3-0
+#SBATCH --time=1-0
 #SBATCH --chdir /scratch/dormann/Memory_genes/src
 #SBATCH --mem 64G
 #SBATCH --mail-type=END

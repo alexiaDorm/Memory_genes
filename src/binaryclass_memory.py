@@ -169,7 +169,7 @@ def objective(trial):
     model = build_model(params)
     
     #Open charac matrix
-    name = 'AE3'
+    name = 'BIDDY_D15_2'
     general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
     charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + name + '__characteristics_output.txt'
     p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + name + '.txt'
