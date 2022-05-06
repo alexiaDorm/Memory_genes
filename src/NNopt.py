@@ -12,7 +12,7 @@ from binaryclass_memory import *
 torch.manual_seed(1)
 
 study = optuna.create_study(direction="maximize", sampler=optuna.samplers.TPESampler())
-study.optimize(objective, n_trials=200)
+study.optimize(objective, n_trials=100)
 
 best_trial = study.best_trial
 

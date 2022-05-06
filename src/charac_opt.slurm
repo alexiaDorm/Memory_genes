@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NNLSKmix"
-#SBATCH --error="NNLSKmix.err"
-#SBATCH --output="NNLSKmix.out"
+#SBATCH --job-name="NNfused"
+#SBATCH --error="NNfused.err"
+#SBATCH --output="NNfused.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
