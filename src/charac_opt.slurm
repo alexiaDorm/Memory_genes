@@ -1,13 +1,13 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="logRegfused"
-#SBATCH --error="logRegfused.err"
-#SBATCH --output="logRegfused.out"
+#SBATCH --job-name="Rbffused"
+#SBATCH --error="Rbffused.err"
+#SBATCH --output="Rbffused.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=1-0
+#SBATCH --time=3-0
 #SBATCH --chdir /scratch/dormann/Memory_genes/src
 #SBATCH --mem 64G
 #SBATCH --mail-type=END
