@@ -120,6 +120,57 @@ def fit_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, f
         
     return scores
 
+def fit_evaluate_all(data_charac:pd.DataFrame, fit_func:str, lamb:float=1, kernel:str='rbf', verbose:bool=True):
+    X = np.array(data_charac.drop(columns=['memory_gene']))
+    Y = np.array(data_charac['memory_gene'])
+    
+    #Fit classifier to charac data
+    if fit_func == 'logreg':
+        clf, score = fit_logistic_reg(X, Y, 'l2', lamb)
+    if fit_func == 'svm':
+        clf, score = fit_svm(X, Y, lamb, kernel)
+
+    #Evaluate fitted classifier
+    y = clf.predict(X)
+    non_memory_gene = list(data_charac[Y == False].index)
+    memory_gene = list(data_charac[Y == True].index)
+    y = pd.DataFrame(y, index = data_charac.index, columns = ['pred'])
+    y['true_label'] = Y
+
+    y_non_mem = y.loc[non_memory_gene]
+    y_mem = y.loc[memory_gene]
+    recovery = np.sum(y_mem['pred'])/len(memory_gene)
+    false_pos = np.sum(y_non_mem['pred'])
+      
+    scores = [score, recovery, false_pos]
+    
+    if verbose:
+        print('accuracy: ',score)
+        print('recovery memory genes: ', recovery)
+        print('false postive: ', false_pos)
+        
+    return clf, scores
+
+def predict_evaluate(data_charac, norm, family, clf):
+    #Evaluate extracted subset on RNAseq Data
+    X = np.array(data_charac.drop(columns=['memory_gene']))
+    Y = np.array(data_charac['memory_gene'])
+    
+    #Get gene set
+    y = clf.predict(X)
+    y = pd.DataFrame(y, index = data_charac.index, columns = ['pred'])
+    gene_subset = list(y[y['pred']==True].index)
+    
+    precision, recovery_clust = np.NaN, np.NaN
+    if gene_subset:
+        norm_subset = np.array(norm.loc[gene_subset].T)
+
+        model = FamiliesClusters(np.unique(family),compute_precision,True)
+        pred = model.fit_predict(norm_subset,family)
+        precision, recovery_clust = model.score_, model.recovery
+        
+    return [precision, recovery_clust]
+
 #--------------------------------------------------------------------------------
 #A few functions for Neural network training
 class Dataset(torch.utils.data.Dataset):

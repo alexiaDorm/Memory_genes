@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="logReg"
-#SBATCH --error="logReg.err"
-#SBATCH --output="logReg.out"
+#SBATCH --job-name="logRegfused"
+#SBATCH --error="logRegfused.err"
+#SBATCH --output="logRegfused.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python LogRegopt.py 
+srun python LogRegFused.py 
  
 echo FINISHED at `date`
 
