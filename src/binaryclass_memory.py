@@ -209,6 +209,8 @@ def objective(trial):
         #Normalize skew_residuals, same for mean_expression after removing outliers
         charac_matrix[i], outliers = remove_extreme_values(charac_matrix[i], k=200)
         charac_matrix[i]['skew_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['skew_residuals']), normalize(charac_matrix[i]['mean_expression'])
+        mean_skew_res = np.mean(charac_matrix[i]['skew_residuals'])
+        charac_matrix[i]['skew_residuals'] -= mean_skew_res
 
     val_charac =  []
     for i in val:
