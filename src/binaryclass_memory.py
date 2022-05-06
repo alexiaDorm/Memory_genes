@@ -151,7 +151,7 @@ def fit_evaluate_all(data_charac:pd.DataFrame, fit_func:str, lamb:float=1, kerne
         
     return clf, scores
 
-def predict_evaluate(data_charac, norm, family, clf):
+def predict_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, clf, mult_pred:bool = False, outliers:list = []):
     #Evaluate extracted subset on RNAseq Data
     X = np.array(data_charac.drop(columns=['memory_gene']))
     Y = np.array(data_charac['memory_gene'])
@@ -160,16 +160,29 @@ def predict_evaluate(data_charac, norm, family, clf):
     y = clf.predict(X)
     y = pd.DataFrame(y, index = data_charac.index, columns = ['pred'])
     gene_subset = list(y[y['pred']==True].index)
+    if outliers:
+        gene_subset.extend(outliers)
     
-    precision, recovery_clust = np.NaN, np.NaN
+    precision, recovery_clust, mult_precision, mult_recovery_clust = np.NaN, np.NaN, np.NaN, np.NaN
     if gene_subset:
         norm_subset = np.array(norm.loc[gene_subset].T)
 
         model = FamiliesClusters(np.unique(family),compute_precision,True)
         pred = model.fit_predict(norm_subset,family)
         precision, recovery_clust = model.score_, model.recovery
+    
+    scores = [precision, recovery_clust]
+    if (mult_pred and gene_subset):
+        subset = np.ones((len(gene_subset),))
+        subsets = subsampling_genes(subset, 101, 0.25)
         
-    return [precision, recovery_clust]
+        model = EnsemblingHierarchical(np.unique(family),compute_precision,True,subsets = subsets, ensembling='voting', threshold_voting = 0.5)
+        result  = model.fit_predict(norm_subset, family)
+        mult_precision, mult_recovery_clust = model.score_, model.recovery
+        
+        scores.extend([mult_precision,mult_recovery_clust])
+    
+    return scores
 
 #--------------------------------------------------------------------------------
 #A few functions for Neural network training
@@ -223,56 +236,65 @@ def compute_scores(network, inputs, targets):
 def objective(trial):
 
     params = {
-              'learning_rate': trial.suggest_loguniform('learning_rate', 1e-6, 1),
-              'n_fl': trial.suggest_int("n_fl", 4, 30),
-              'n_sl': trial.suggest_int("n_sl", 4, 30),
-              'batch_size': trial.suggest_int("batch_size", 32, 512, log=True)
+              'learning_rate': trial.suggest_loguniform('learning_rate', 1e-8, 100),
+              'n_fl': trial.suggest_int("n_fl", 4, 50),
+              'n_sl': trial.suggest_int("n_sl", 4, 50),
+              'batch_size': trial.suggest_int("batch_size", 32, 256)
               }
     
     model = build_model(params)
     
-    #Open charac matrix
+    #Load data
     general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
 
-    names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2',
-            'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 
-            'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 
-            'LK_LSK_D2_exp3_library_d2_5', 'LSK_D2_exp1_library_LSK_d2_1', 'LSK_D2_exp1_library_LSK_d2_2', 'LSK_D2_exp1_library_LSK_d2_3',
-           'LSK_D2_exp2_library_d2A_1', 'LSK_D2_exp2_library_d2A_2', 'LSK_D2_exp2_library_d2A_3' , 'LSK_D2_exp2_library_d2A_4', 'LSK_D2_exp2_library_d2A_5', 
-           'LSK_D2_exp2_library_d2B_1','LSK_D2_exp2_library_d2B_2', 'LSK_D2_exp2_library_d2B_3', 'LSK_D2_exp2_library_d2B_4', 'LSK_D2_exp2_library_d2B_5']
+    names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2']
+
     charac_matrix = []
+    norm_matrix = []
+    families_matrix = []
     for name in names:
         #Open characteristics file
         charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + name + '__characteristics_output.txt'
         p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + name + '.txt'
         charac_matrix.append(open_charac(charac_out_path, p_value_path, 200))
 
+        #Open normalized data
+        norm_path = '../data/merged_data/' + name + '.csv'
+        fam_path = '../data/merged_data/y_' + name + '.csv'
+        norm = pd.read_csv (norm_path)
+        norm = norm.set_index('Unnamed: 0')
+        families= np.squeeze(np.array(pd.read_csv(fam_path)))
+
+        norm_matrix.append(norm)
+        families_matrix.append(families)
+
     #Add general characteristic
     for i in range(0,len(charac_matrix)):
         charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
         charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
         charac_matrix[i] = charac_matrix[i].dropna()
-        #Remove AE7, also keep BIDDYD15_2 and LSK_D2_exp1_library_LSK_d2_1
-    val = [8,17]
-    data_to_fuse = [0,1,3,4,5,6,7,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29] 
+
+    #Remove AE7, also keep BIDDYD15_2 for validation
+    val = [8]
+    data_to_fuse = [0,1,3,4,5,6,7]
 
     for data in charac_matrix:
         #Normalize skew_residuals, same for mean_expression after removing outliers
         charac_matrix[i], outliers = remove_extreme_values(charac_matrix[i], k=200)
         charac_matrix[i]['skew_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['skew_residuals']), normalize(charac_matrix[i]['mean_expression'])
-        mean_skew_res = np.mean(charac_matrix[i]['skew_residuals'])
-        charac_matrix[i]['skew_residuals'] -= mean_skew_res
 
     val_charac =  []
     for i in val:
         val_charac.append(charac_matrix[i])
     fused_charac = []
+    name_fused = []
     for i in data_to_fuse:
         fused_charac.append(charac_matrix[i])
-    
-    fused_charac = pd.concat(fused_charac)
+        name_fused.append(names[i])
 
-    accuracy = train_and_evaluate(params, model, fused_charac)
+    fused = pd.concat(fused_charac)
+
+    accuracy = train_and_evaluate(params, model, fused)
 
     return accuracy
 
@@ -360,21 +382,21 @@ def train_and_evaluate(param, model, data):
         with torch.no_grad():
             
             # Iterate over the test data and generate predictions
-            accuracy = []
+            correct, total = 0, 0
             for i, data in enumerate(testloader, 0):
                 # Get inputs
                 inputs, targets = data
                 inputs, targets = inputs.to(torch.float32), targets.to(torch.float32)
 
                 #Compute accuracy on testing fold
-                accuracy.append(compute_scores(network, inputs, targets))
+                outputs = torch.sigmoid(network(inputs))
+                outputs[outputs >= 0.5] = 1
+                outputs[outputs < 0.5] = 0
+                targets, outputs = targets.detach().numpy(), outputs.detach().numpy()
 
-            # Store memory genes recovery and FP
-            accuracy = np.array(accuracy)
-            recovery = 100* (np.nanmean(accuracy[:,1]))
-            FP_rate = np.NaN if np.all(accuracy[:,2]!=accuracy[:,2]) else 100* np.nanmean(accuracy[:,2])
-            results.append(recovery - FP_rate)
-            
-    mean_recovery = np.nanmean(results) #return the average memory genes recovery across folds
+                correct += np.sum(targets == outputs)
+                total += targets.shape[0]
+             
+        result.append(correct/total)
 
-    return mean_recovery
+    return np.mean(results)
