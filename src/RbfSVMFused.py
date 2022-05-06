@@ -46,7 +46,7 @@ for i in range(0,len(charac_matrix)):
     charac_matrix[i] = charac_matrix[i].dropna()
     
 #Remove AE7, also keep BIDDYD15_2 for validation
-val = [8,17]
+val = [8]
 data_to_fuse = [0,1,3,4,5,6,7]
 
 for data in charac_matrix:
