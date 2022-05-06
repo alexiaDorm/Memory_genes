@@ -46,8 +46,7 @@ for name in names:
     
 #Add general characteristic
 for i in range(0,len(charac_matrix)):
-    charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
-    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
+    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans'], axis=1)
     charac_matrix[i] = charac_matrix[i].dropna()
     
 #Remove AE7, also keep BIDDYD15_2 for validation
@@ -87,7 +86,7 @@ for lamb in C:
     
     #Save individual clustering results
     scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery'])
-    scores_df.to_csv('../data/binaryClass_scores/LogRegfused/' + str(lamb) + '.csv', index=True)
+    scores_df.to_csv('../data/binaryClass_scores/LogRegfused/' + str(lamb) + 'few.csv', index=True)
     
 scores_df = pd.DataFrame(scores_grid, index = C, columns= scores_name)
-scores_df.to_csv('../data/binaryClass_scores/LogRegfused/fused.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/LogRegfused/fusedfew.csv', index=True)
