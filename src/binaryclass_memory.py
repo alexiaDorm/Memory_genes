@@ -397,6 +397,6 @@ def train_and_evaluate(param, model, data):
                 correct += np.sum(targets == outputs)
                 total += targets.shape[0]
              
-        result.append(correct/total)
+        results.append(correct/total)
 
     return np.mean(results)
