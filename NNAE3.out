@@ -1,0 +1,8 @@
+STARTING AT Wed May 4 10:04:47 CEST 2022
+learning_rate: 0.311582537782765
+n_fl: 15
+n_sl: 16
+batch_size: 461
+
+with score 24.5185
+FINISHED at Wed May 4 16:48:30 CEST 2022
