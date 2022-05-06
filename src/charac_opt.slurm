@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=4-0
+#SBATCH --time=3-12
 #SBATCH --chdir /scratch/dormann/Memory_genes/src
 #SBATCH --mem 64G
 #SBATCH --mail-type=END
