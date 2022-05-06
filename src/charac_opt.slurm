@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="logRegfused"
-#SBATCH --error="logRegfused.err"
-#SBATCH --output="logRegfused.out"
+#SBATCH --job-name="logRegfusedLSK"
+#SBATCH --error="logRegfusedLSK.err"
+#SBATCH --output="logRegfusedLSK.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
