@@ -51,8 +51,8 @@ for i in range(0,len(charac_matrix)):
     charac_matrix[i] = charac_matrix[i].dropna()
     
 #Remove AE7, also keep BIDDYD15_2 for validation
-val = [8,17]
-data_to_fuse = [0,1,3,4,5,6,7,9,10,11,12,13,14,15,16,18,19,20,21,22,23,24,25,26,27,28,29]
+val = [8]
+data_to_fuse = [0,1,3,4,5,6,7]
 
 for data in charac_matrix:
     #Normalize skew_residuals, same for mean_expression after removing outliers
@@ -87,7 +87,7 @@ for lamb in C:
     
     #Save individual clustering results
     scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery'])
-    scores_df.to_csv('../data/binaryClass_scores/LogRegfusedLSK/' + str(lamb) + '.csv', index=True)
+    scores_df.to_csv('../data/binaryClass_scores/LogRegfused/' + str(lamb) + '.csv', index=True)
     
 scores_df = pd.DataFrame(scores_grid, index = C, columns= scores_name)
-scores_df.to_csv('../data/binaryClass_scores/LogRegfusedLSK/fused.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/LogRegfused/fused.csv', index=True)
