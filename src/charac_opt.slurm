@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NNfused"
-#SBATCH --error="NNfused.err"
-#SBATCH --output="NNfused.out"
+#SBATCH --job-name="logReg"
+#SBATCH --error="logReg.err"
+#SBATCH --output="logReg.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python NNopt.py 
+srun python LogRegopt.py 
  
 echo FINISHED at `date`
 
