@@ -1,13 +1,13 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="Logval"
-#SBATCH --error="Logval.err"
-#SBATCH --output="Logval.out"
+#SBATCH --job-name="SVMfused"
+#SBATCH --error="SVMfused.err"
+#SBATCH --output="SVMfused.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=1-0
+#SBATCH --time=3-0
 #SBATCH --chdir /scratch/dormann/Memory_genes/src
 #SBATCH --mem 64G
 #SBATCH --mail-type=END
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python ValidationLog.py 
+srun python RbfSVMFused.py 
  
 echo FINISHED at `date`
 
