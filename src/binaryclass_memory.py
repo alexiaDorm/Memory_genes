@@ -241,6 +241,7 @@ def objective(trial):
               'learning_rate': trial.suggest_loguniform('learning_rate', 1e-8, 100),
               'n_fl': trial.suggest_int("n_fl", 4, 50),
               'n_sl': trial.suggest_int("n_sl", 4, 50),
+              'n_tl': trial.suggest_int("n_tl", 4, 50),
               'batch_size': trial.suggest_int("batch_size", 32, 256)
               }
     
@@ -308,7 +309,9 @@ def build_model(params):
         nn.ReLU(),
         nn.Linear(params['n_fl'], params['n_sl']),
         nn.ReLU(),
-        nn.Linear(params['n_sl'],1)
+        nn.Linear(params['n_sl'],params['n_tl']),
+        nn.ReLU(),
+        nn.Linear(params['n_tl'],1)
         
     )
 
