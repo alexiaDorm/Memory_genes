@@ -1,0 +1,15 @@
+STARTING AT Fri May 6 18:19:40 CEST 2022
+Training scores
+accuracy:  0.8510389412896407
+recovery memory genes:  0.2711421350977322
+false postive:  713.4285714285714
+100 clustering precision:  0.7550048143983109
+100 clustering recovery:  0.8460487100419856
+-----------------
+Validation scores
+accuracy:  0.8790601600826233
+recovery memory genes:  0.2095879556259905
+false postive:  347
+100 clustering precision:  1.0
+100 clustering recovery:  0.9
+FINISHED at Fri May 6 18:28:58 CEST 2022

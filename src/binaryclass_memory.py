@@ -322,6 +322,10 @@ def train_and_evaluate(param, model, data):
     #Load data into torch.Dataset
     labels = np.expand_dims((data['memory_gene']*1), axis=1)
     X = data.drop(['memory_gene'], axis=1)
+    #Oversample the memory genes data points
+    ros = RandomOverSampler(random_state=42)
+    X, labels = ros.fit_resample(X, labels)
+    labels = np.expand_dims(labels, axis =1)
     dataset = Dataset(np.array(X), labels)
     
     # K-fold Cross Validation model evaluation
@@ -346,10 +350,10 @@ def train_and_evaluate(param, model, data):
         # Initialize optimizer and loss function
         optimizer = torch.optim.Adam(network.parameters(), lr=param['learning_rate'])
         #Determine ratio #non-memory genes/#memory genes to for pos_weight for loss function to deal with unbalanced data.
-        num_positives= np.sum(dataset.labels)
-        num_negatives = len(dataset.labels) - num_positives
-        pos_weight  = torch.as_tensor(num_negatives / num_positives, dtype=torch.float)
-        loss_function = nn.BCEWithLogitsLoss(pos_weight = pos_weight) 
+        #num_positives= np.sum(dataset.labels)
+        #num_negatives = len(dataset.labels) - num_positives
+        #pos_weight  = torch.as_tensor(num_negatives / num_positives, dtype=torch.float)
+        loss_function = nn.BCEWithLogitsLoss() 
 
         # Run the training loop for defined number of epochs
         accuracy = []
