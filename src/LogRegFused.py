@@ -88,7 +88,7 @@ for lamb in C:
     #Evaluate clustering
     clust_score = []
     for i in data_to_fuse:
-        clust_score.append(predict_evaluate(charac_matrix[i], axis = 1), norm_matrix[i], families_matrix[i], clf))
+        clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], clf))
     scores.extend([np.nanmean(np.array(clust_score)[:,0]), np.nanmean(np.array(clust_score)[:,1])])
     scores_grid.append(scores)
     
