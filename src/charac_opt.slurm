@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NNfused3"
-#SBATCH --error="NNfused3.err"
-#SBATCH --output="NNfused3.out"
+#SBATCH --job-name="NNfused4"
+#SBATCH --error="NNfused4.err"
+#SBATCH --output="NNfused4.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
