@@ -69,18 +69,23 @@ for i in data_to_fuse:
     
 fused = pd.concat(fused_charac)
 
+#Oversample the memory genes data points
+ros = RandomOverSampler(random_state=42)
+X, labels = ros.fit_resample(fused.drop(['memory_gene'], axis = 1), fused['memory_gene'])
+
+
 #Grid search of penalty values
 #L2 regularization
 scores_name = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
 C = np.logspace(-10, 3, 14)
 scores_grid = []
 for lamb in C:
-    clf, scores = fit_evaluate_all(fused, 'logreg', lamb = lamb, verbose = False)
+    clf, scores = fit_evaluate_all(X, 'logreg', lamb = lamb, verbose = False)
     
     #Evaluate clustering
     clust_score = []
     for i in data_to_fuse:
-        clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], clf))
+        clust_score.append(predict_evaluate(charac_matrix[i].drop(['memory_gene'], axis = 1), norm_matrix[i], families_matrix[i], clf))
     scores.extend([np.nanmean(np.array(clust_score)[:,0]), np.nanmean(np.array(clust_score)[:,1])])
     scores_grid.append(scores)
     
