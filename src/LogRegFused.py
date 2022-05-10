@@ -71,7 +71,10 @@ fused = pd.concat(fused_charac)
 
 #Oversample the memory genes data points
 ros = RandomOverSampler(random_state=42)
-X, labels = ros.fit_resample(fused.drop(['memory_gene'], axis = 1), fused['memory_gene'])
+labels = fused['memory_gene']
+X = fused.drop(columns=['memory_gene'])
+               
+X, labels = ros.fit_resample(X,labels)
 
 
 #Grid search of penalty values
