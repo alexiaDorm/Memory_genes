@@ -94,16 +94,16 @@ for i in range(1,7):
     means = grid_result.cv_results_['mean_test_score']
     params = grid_result.cv_results_['params']
     
-#Fit ADAboost with best params and evaluate clustering
-base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
-model = AdaBoostClassifier(base_estimator = base_tree)
+    #Fit ADAboost with best params and evaluate clustering
+    base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
+    model = AdaBoostClassifier(base_estimator = base_tree, n_estimators = best_param['n_estimators'], learning_rate= best_param['learning_rate'])
 
-clust_score = []
-for i in data_to_fuse:
-    clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], model, mult_pred=True))
+    clust_score = []
+    for i in data_to_fuse:
+        clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], model, mult_pred=True))
     
-#Save individual clustering results
-scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/ADAboost_treefew.csv', index=True)
+    #Save individual clustering results
+    scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
+    scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA' + str(i) +'.csv', index=True)
 
 
