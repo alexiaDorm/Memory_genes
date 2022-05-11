@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="LogFused"
-#SBATCH --error="LogFused.err"
-#SBATCH --output="LogFused.out"
+#SBATCH --job-name="ADAfew"
+#SBATCH --error="ADAfew.err"
+#SBATCH --output="ADAfew.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python LogRegFused.py 
+srun python ADAboostFused.py 
  
 echo FINISHED at `date`
 
