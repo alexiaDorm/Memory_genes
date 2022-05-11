@@ -97,6 +97,7 @@ for i in range(1,7):
     #Fit ADAboost with best params and evaluate clustering
     base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
     model = AdaBoostClassifier(base_estimator = base_tree, n_estimators = best_param['n_estimators'], learning_rate= best_param['learning_rate'])
+    model = model.fit(X,y)
 
     clust_score = []
     for i in data_to_fuse:
