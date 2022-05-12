@@ -81,7 +81,7 @@ for i in range(3,10):
     print(i)
     base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
     model = AdaBoostClassifier(base_estimator = base_tree)
-    grid = {'n_estimators' : [50, 100, 500, 1000],'learning_rate' : [0.001, 0.01, 0.1, 1.0,10,100,1000]}
+    grid = {'n_estimators' : [50, 100, 500, 1000],'learning_rate' : [0.001, 0.01, 0.1, 1.0]}
     cv = KFold(n_splits=5, shuffle=True, random_state=1)
     grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
