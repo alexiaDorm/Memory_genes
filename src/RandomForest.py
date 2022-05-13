@@ -95,7 +95,7 @@ best_acc, best_params = random_search.best_score_, random_search.best_params
 print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc) 
 
 #------------------------------------------------------------------------
-rf = RandomForestRegressor(class_weight = "balanced_subsample")
+'''rf = RandomForestRegressor(class_weight = "balanced_subsample")
 grid = {'bootstrap': [True, False],
  'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
  'max_features': ['auto', 'sqrt'],
