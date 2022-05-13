@@ -83,7 +83,7 @@ class_weight = (len(y)-np.sum(y))/ np.sum(y)
 model = XGBClassifier(scale_pos_weight= class_weight, eval_metric='accuracy')
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
 
-grid = {'learning_rate': 'learning_rate' : [0.001, 0.01, 0.1, 1.0],
+grid = {'learning_rate': [0.001, 0.01, 0.1, 1.0],
  'colsample_bytree' : np.arange(0.5,1,0.1),
  'max_depth': np.arange(3,10,1),
  'subsample' : np.arange(0.6,1,0.1),
