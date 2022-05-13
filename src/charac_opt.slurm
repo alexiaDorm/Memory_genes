@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="KNNover"
-#SBATCH --error="KNNover.err"
-#SBATCH --output="KNNover.out"
+#SBATCH --job-name="KNNunder"
+#SBATCH --error="KNNunder.err"
+#SBATCH --output="KNNunder.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1

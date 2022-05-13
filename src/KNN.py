@@ -8,7 +8,8 @@ import sklearn
 import pyreadr
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, KFold
 from sklearn.neighbors import KNeighborsClassifier
-from imblearn.under_sampling import RandomUnderSampler, RandomOverSampler
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.over_sampling import RandomOverSampler
 
 from load_data import open_charac
 from binaryclass_memory import *
@@ -77,11 +78,11 @@ y = np.array(fused['memory_gene'])
 
 #Oversample data
 ros = RandomOverSampler(random_state=42)    
-X, y = ros.fit_resample(X,y)
+#X, y = ros.fit_resample(X,y)
 
 #Undersample data
 rus = RandomUnderSampler(random_state=42)
-#X,y = rus.fit_resample(X,y)
+X,y = rus.fit_resample(X,y)
 
 #KNN - hyperparameters tuning
 #Define model, grid search space, CV
