@@ -1,0 +1,12 @@
+STARTING AT Mon May 9 10:09:02 CEST 2022
+accuracy:  0.8494354824711795
+recovery memory genes:  0.28726845142660407
+false postive:  795.4285714285714
+100 clustering precision:  0.7211007433276341
+100 clustering recovery:  0.8399879675687113
+accuracy:  0.1313710302091402
+recovery memory genes:  1.0
+false postive:  16821
+100 clustering precision:  0.6666666666666666
+100 clustering recovery:  0.75
+FINISHED at Mon May 9 12:22:30 CEST 2022
