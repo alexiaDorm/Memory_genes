@@ -92,9 +92,6 @@ for i in range(3,10):
     best_acc, best_param = grid_result.best_score_, grid_result.best_params_
     print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)  
     
-    means = grid_result.cv_results_['mean_test_score']
-    params = grid_result.cv_results_['params']
-    
     #Fit ADAboost with best params and evaluate clustering
     base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
     model = AdaBoostClassifier(base_estimator = base_tree, n_estimators = best_param['n_estimators'], learning_rate= best_param['learning_rate'])

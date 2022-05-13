@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="KNNover"
-#SBATCH --error="KNNover.err"
-#SBATCH --output="KNNover.out"
+#SBATCH --job-name="CAI"
+#SBATCH --error="CAI.err"
+#SBATCH --output="CAI.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python KNN.py 
+srun python CodonOpt.py 
  
 echo FINISHED at `date`
 
