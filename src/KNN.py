@@ -78,11 +78,11 @@ y = np.array(fused['memory_gene'])
 
 #Oversample data
 ros = RandomOverSampler(random_state=42)    
-#X, y = ros.fit_resample(X,y)
+X, y = ros.fit_resample(X,y)
 
 #Undersample data
 rus = RandomUnderSampler(random_state=42)
-X,y = rus.fit_resample(X,y)
+#X,y = rus.fit_resample(X,y)
 
 #KNN - hyperparameters tuning
 #Define model, grid search space, CV
