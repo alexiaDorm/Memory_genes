@@ -86,7 +86,7 @@ grid = {'bootstrap': [True, False],
 #Define model, random grid search space, CV
 rf = RandomForestRegressor(class_weight = "balanced_subsample")
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
-random_search = RandomizedSearchCV(estimator = rf, param_distributions = random_grid, n_iter = 100, cv = cv, scoring='accuracy', random_state=42, n_jobs = -1)
+random_search = RandomizedSearchCV(estimator = rf, param_distributions = grid, n_iter = 100, cv = cv, scoring='accuracy', random_state=42, n_jobs = -1)
 
 #Get best param
 random_search.fit(X, y)
@@ -94,11 +94,15 @@ best_acc, best_params = random_search.best_score_, random_search.best_params
 print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc) 
 
 #------------------------------------------------------------------------
-'''base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
-    model = AdaBoostClassifier(base_estimator = base_tree)
-    grid = {'n_estimators' : [50, 100, 500],'learning_rate' : [0.01, 0.1, 1.0]}
-    cv = KFold(n_splits=5, shuffle=True, random_state=1)
-    grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
+'''rf = RandomForestRegressor(class_weight = "balanced_subsample")
+grid = {'bootstrap': [True, False],
+ 'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
+ 'max_features': ['auto', 'sqrt'],
+ 'min_samples_leaf': [1, 2, 4],
+ 'min_samples_split': [2, 5, 10],
+ 'n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}
+cv = KFold(n_splits=5, shuffle=True, random_state=1)
+grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
     #Grid search
     grid_result = grid_search.fit(X, y)
@@ -121,6 +125,4 @@ print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)
     
     #Save individual clustering results
     scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-    scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA' + str(i) +'.csv', index=True)
-'''
-
+    scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA' + str(i) +'.csv', index=True)'''
