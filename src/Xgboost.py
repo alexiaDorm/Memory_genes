@@ -6,9 +6,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import sklearn
 import pyreadr
-from sklearn.model_selection import KFold
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV, KFold
+from xgboost.sklearn import XGBClassifier
 
 
 from load_data import open_charac
@@ -76,18 +75,23 @@ fused = pd.concat(fused_charac)
 X = np.array(fused.drop(columns=['memory_gene']))
 y = np.array(fused['memory_gene'])
 
-grid = {'bootstrap': [True, False],
- 'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
- 'max_features': ['auto', 'sqrt'],
- 'min_samples_leaf': [1, 2, 4],
- 'min_samples_split': [2, 5, 10],
- 'n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}
+
 
 #Random forest - hyperparameters tuning
 #Define model, random grid search space, CV
-rf = RandomForestClassifier(class_weight = "balanced_subsample")
+class_weight = (len(y)-np.sum(y))/ np.sum(y)
+model = XGBClassifier(scale_pos_weight= class_weight, eval_metric='accuracy')
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
-random_search = RandomizedSearchCV(estimator = rf, param_distributions = grid, n_iter = 100, cv = cv, scoring='accuracy', random_state=42, n_jobs = -1)
+
+subsample: 0.6–1
+grid = {'learning_rate': 'learning_rate' : [0.001, 0.01, 0.1, 1.0],
+ 'colsample_bytree' : np.arange(0.5,1,0.1),
+ 'max_depth': np.arange(3,10,1),
+ 'subsample' : np.arange(0.6,1,0.1),
+ 'n_estimators': [100, 200, 400, 600, 800],
+ 'reg_alpha': [0.001, 0.01, 0.1, 1.0]}
+
+random_search = RandomizedSearchCV(estimator = model, param_distributions = grid, n_iter = 200, cv = cv, scoring='accuracy', random_state=42, n_jobs = -1)
 
 #Get best param
 random_search.fit(X, y)
@@ -96,7 +100,7 @@ print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)
 
 #------------------------------------------------------------------------
 #Grid search around best found parameters during random grid search
-rf = RandomForestRegressor(class_weight = "balanced_subsample")
+'''rf = RandomForestRegressor(class_weight = "balanced_subsample")
 grid = {'bootstrap': [True, False],
  'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
  'max_features': ['auto', 'sqrt'],
@@ -127,4 +131,4 @@ for i in data_to_fuse:
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA.csv', index=True)'''
