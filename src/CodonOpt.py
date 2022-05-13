@@ -76,5 +76,5 @@ error = genes.iloc[3][0]
 genes = genes[genes.cds != error]
 
 #Compute the CAI for each gene
-genes['CAI'] = genes.apply(lambda x: compute_CAI(genes['cds'], codon_freq), axis=1)
+genes['CAI'] = genes.apply(lambda x: compute_CAI(x['cds'], codon_freq), axis=1)
 genes.to_csv('../data/CAI.csv', index=True)
