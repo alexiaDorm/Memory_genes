@@ -85,7 +85,7 @@ grid = {'bootstrap': [True, False],
 
 #Random forest - hyperparameters tuning
 #Define model, random grid search space, CV
-rf = RandomForestRegressor(class_weight = "balanced_subsample")
+rf = RandomForestClassifier(class_weight = "balanced_subsample")
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
 random_search = RandomizedSearchCV(estimator = rf, param_distributions = grid, n_iter = 100, cv = cv, scoring='accuracy', random_state=42, n_jobs = -1)
 
@@ -105,19 +105,19 @@ grid = {'bootstrap': [True, False],
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
 grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
-    #Grid search
-    grid_result = grid_search.fit(X, y)
+#Grid search
+grid_result = grid_search.fit(X, y)
     
-    #Get best scores
-    best_acc, best_param = grid_result.best_score_, grid_result.best_params_
-    print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)  
+#Get best scores
+best_acc, best_param = grid_result.best_score_, grid_result.best_params_
+print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)  
     
-    means = grid_result.cv_results_['mean_test_score']
-    params = grid_result.cv_results_['params']
+means = grid_result.cv_results_['mean_test_score']
+params = grid_result.cv_results_['params']
     
-    #Fit ADAboost with best params and evaluate clustering
-    base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
-    model = AdaBoostClassifier(base_estimator = base_tree, n_estimators = best_param['n_estimators'], learning_rate= best_param['learning_rate'])
+#Fit RandomForest with best params and evaluate clustering
+rf = RandomForestRegressor(class_weight = "balanced_subsample")
+model = AdaBoostClassifier(n_estimators = best_param['n_estimators'], max_depth = best_param['max_depth'], max_features = best_param['max_depth'])
     model = model.fit(X,y)
 
     clust_score = []
