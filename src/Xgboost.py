@@ -80,7 +80,7 @@ y = np.array(fused['memory_gene'])
 #Random forest - hyperparameters tuning
 #Define model, random grid search space, CV
 class_weight = (len(y)-np.sum(y))/ np.sum(y)
-model = XGBClassifier(scale_pos_weight= class_weight, eval_metric='accuracy')
+model = XGBClassifier(scale_pos_weight= class_weight)
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
 
 grid = {'learning_rate': [0.001, 0.01, 0.1, 1.0],
