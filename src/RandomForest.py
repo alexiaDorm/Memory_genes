@@ -91,12 +91,12 @@ random_search = RandomizedSearchCV(estimator = rf, param_distributions = grid, n
 
 #Get best param
 random_search.fit(X, y)
-best_acc, best_params = random_search.best_score_, random_search.best_params
+best_acc, best_params = random_search.best_score_, random_search.best_params_
 print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc) 
 
 #------------------------------------------------------------------------
 #Grid search around best found parameters during random grid search
-rf = RandomForestRegressor(class_weight = "balanced_subsample")
+'''rf = RandomForestRegressor(class_weight = "balanced_subsample")
 grid = {'bootstrap': [True, False],
  'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
  'max_features': ['auto', 'sqrt'],
@@ -127,4 +127,4 @@ for i in data_to_fuse:
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA.csv', index=True)'''

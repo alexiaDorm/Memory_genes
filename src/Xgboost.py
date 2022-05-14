@@ -79,6 +79,7 @@ y = np.array(fused['memory_gene'])
 #Xgboost - hyperparameters tuning
 #Define model, random grid search space, CV
 
+class_weight = (len(y)- np.sum(y))/np.sum(y)
 model = XGBClassifier(scale_pos_weight= class_weight)
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
 
