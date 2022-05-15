@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="Rf"
-#SBATCH --error="RF.err"
-#SBATCH --output="RF.out"
+#SBATCH --job-name="KNNover"
+#SBATCH --error="KNNover.err"
+#SBATCH --output="KNNover.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python RandomForest.py 
+srun python KNN.py 
  
 echo FINISHED at `date`
 
