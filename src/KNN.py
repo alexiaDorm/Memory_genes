@@ -94,14 +94,14 @@ grid = {'n_neighbors': np.arange(2,31,1),
  'leaf_size' : np.arange(5,51,5),
  'p' : np.arange(1,5,1)}
 
-grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
+grid_search = RandomizedSearchCV(estimator = model, param_distributions = grid, n_iter = 200, cv = cv, scoring='accuracy', random_state=42, n_jobs = -1)
 grid_search.fit(X, y)
 
 #Get best param
 best_acc, best_params = grid_search.best_score_, grid_search.best_params_
-print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc) 
+print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc) 
     
-#Fit KNN with best params and evaluate clustering
+'''#Fit KNN with best params and evaluate clustering
 model = KNeighborsClassifier(n_neighbors = best_params['n_neighbors'], weights = best_params['weights'], leaf_size = best_params['leaf_size'], p = best_params['p'])
 model = rf.fit(X,y)
 
@@ -111,4 +111,4 @@ for i in data_to_fuse:
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/KNNover.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/KNNover.csv', index=True)'''

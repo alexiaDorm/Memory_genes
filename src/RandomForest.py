@@ -81,7 +81,7 @@ grid = {'bootstrap': [True, False],
  'max_features': ['auto', 'sqrt'],
  'min_samples_leaf': [1, 2, 4],
  'min_samples_split': [2, 5, 10],
- 'n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}
+ 'n_estimators': [200, 400, 600, 800]}
 
 #Random forest - hyperparameters tuning
 #Define model, random grid search space, CV
@@ -92,7 +92,7 @@ random_search = RandomizedSearchCV(estimator = rf, param_distributions = grid, n
 #Get best param
 random_search.fit(X, y)
 best_acc, best_params = random_search.best_score_, random_search.best_params_
-print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc) 
+print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc) 
 
 #------------------------------------------------------------------------
 #Grid search around best found parameters during random grid search

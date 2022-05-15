@@ -95,7 +95,7 @@ random_search = RandomizedSearchCV(estimator = model, param_distributions = grid
 #Get best param
 random_search.fit(X, y)
 best_acc, best_params = random_search.best_score_, random_search.best_params_
-print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc) 
+print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc) 
 
 #------------------------------------------------------------------------
 #Grid search around best found parameters during random grid search
