@@ -8,7 +8,7 @@ import sklearn
 import pyreadr
 from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 
 
 from load_data import open_charac
