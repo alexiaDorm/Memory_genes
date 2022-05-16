@@ -97,9 +97,9 @@ print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc
 #------------------------------------------------------------------------
 #Grid search around best found parameters during random grid search
 model = RandomForestClassifier(class_weight = "balanced_subsample")
-grid = {'bootstrap': True,
+grid = {'bootstrap': [True],
  'max_depth': [60, 70, 80],
- 'max_features': 'sqrt',
+ 'max_features': ['sqrt'],
  'min_samples_leaf': [1, 2],
  'min_samples_split': [2, 3, 4],
  'n_estimators': [100,200, 300]}
