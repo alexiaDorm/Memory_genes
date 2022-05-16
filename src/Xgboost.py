@@ -79,7 +79,7 @@ y = np.array(fused['memory_gene'])
 #Xgboost - hyperparameters tuning
 #Define model, random grid search space, CV
 
-class_weight = (len(y)- np.sum(y))/np.sum(y)
+'''class_weight = (len(y)- np.sum(y))/np.sum(y)
 model = XGBClassifier(scale_pos_weight= class_weight)
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
 
@@ -95,17 +95,20 @@ random_search = RandomizedSearchCV(estimator = model, param_distributions = grid
 #Get best param
 random_search.fit(X, y)
 best_acc, best_params = random_search.best_score_, random_search.best_params_
-print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc) 
+print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc) '''
 
 #------------------------------------------------------------------------
 #Grid search around best found parameters during random grid search
-'''rf = RandomForestRegressor(class_weight = "balanced_subsample")
-grid = {'bootstrap': [True, False],
- 'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
- 'max_features': ['auto', 'sqrt'],
- 'min_samples_leaf': [1, 2, 4],
- 'min_samples_split': [2, 5, 10],
- 'n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}
+class_weight = (len(y)- np.sum(y))/np.sum(y)
+model = XGBClassifier(scale_pos_weight= class_weight)
+
+grid = {'learning_rate': [0.1, 1.0],
+ 'colsample_bytree' : np.arange(0.7,1,0.1),
+ 'max_depth': np.arange(7,10,1),
+ 'subsample' : np.arange(0.7,1,0.1),
+ 'n_estimators': [500, 600, 700],
+ 'reg_alpha': [0.001, 0.01, 0.1]}
+
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
 grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
@@ -116,13 +119,10 @@ grid_result = grid_search.fit(X, y)
 best_acc, best_param = grid_result.best_score_, grid_result.best_params_
 print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)  
     
-means = grid_result.cv_results_['mean_test_score']
-params = grid_result.cv_results_['params']
-    
 #Fit RandomForest with best params and evaluate clustering
-rf = RandomForestClassifier(n_estimators = best_param['n_estimators'], max_depth = best_param['max_depth'], max_features = best_param['max_features'], min_samples_leaf = best_param['min_samples_leaf'], min_samples_split  = best_param['min_samples_split'], class_weight = "balanced_subsample")
+model = XGBClassifier(learning_rate = best_param['learning_rate'], colsample_bytree = best_param['colsample_bytree'], max_depth = best_param['max_depth'], subsample = best_param['subsample'], n_estimators = best_param['n_estimators'], reg_alpha = best_param['reg_alpha'], scale_pos_weight= class_weight)
 
-rf = rf.fit(X,y)
+model = model.fit(X,y)
 
 clust_score = []
 for i in data_to_fuse:
@@ -130,4 +130,4 @@ for i in data_to_fuse:
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA.csv', index=True)'''
+scores_df.to_csv('../data/binaryClass_scores/XGB.csv', index=True)
