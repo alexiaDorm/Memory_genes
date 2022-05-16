@@ -77,11 +77,10 @@ y = np.array(fused['memory_gene'])
 
 #Adaboosting with decision trees - hyperparameters tuning
 #Define model, grid search space, CV
-for i in range(8,21):
-    print(i)
+for i in range(14,15):
     base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
     model = AdaBoostClassifier(base_estimator = base_tree)
-    grid = {'n_estimators' : [300, 400, 500],'learning_rate' : [0.01, 0.1, 1.0]}
+    grid = {'n_estimators' : [500,600,700,800],'learning_rate' : [0.01, 0.1]}
     cv = KFold(n_splits=5, shuffle=True, random_state=1)
     grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
@@ -90,7 +89,7 @@ for i in range(8,21):
     
     #Get best scores
     best_acc, best_param = grid_result.best_score_, grid_result.best_params_
-    print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)  
+    print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)
     
     #Fit ADAboost with best params and evaluate clustering
     base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
@@ -103,6 +102,6 @@ for i in range(8,21):
     
     #Save individual clustering results
     scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-    scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA' + str(i) +'.csv', index=True)
-
+    scores_df.to_csv('../data/binaryClass_scores/ADA.csv', index=True)
+    print(scores_df)
 
