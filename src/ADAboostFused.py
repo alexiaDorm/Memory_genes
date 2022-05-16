@@ -80,7 +80,7 @@ y = np.array(fused['memory_gene'])
 for i in range(14,15):
     base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
     model = AdaBoostClassifier(base_estimator = base_tree)
-    grid = {'n_estimators' : [500,600,700,800],'learning_rate' : [0.01, 0.1]}
+    grid = {'n_estimators' : [800,900,1000,1200],'learning_rate' : [0.01, 0.1]}
     cv = KFold(n_splits=5, shuffle=True, random_state=1)
     grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
