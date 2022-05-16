@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="ADA"
-#SBATCH --error="ADAmore.err"
-#SBATCH --output="ADAmore.out"
+#SBATCH --job-name="ADAall"
+#SBATCH --error="ADAall.err"
+#SBATCH --output="ADAall.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1

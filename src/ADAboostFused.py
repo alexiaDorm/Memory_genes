@@ -50,7 +50,8 @@ for name in names:
     
 #Add general characteristic
 for i in range(0,len(charac_matrix)):
-    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans'], axis=1)
+    charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
+    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
     charac_matrix[i] = charac_matrix[i].dropna()
     
 #Remove AE7, also keep BIDDYD15_2 for validation
@@ -80,7 +81,7 @@ y = np.array(fused['memory_gene'])
 for i in range(14,15):
     base_tree = DecisionTreeClassifier(max_depth = i, class_weight = 'balanced')
     model = AdaBoostClassifier(base_estimator = base_tree)
-    grid = {'n_estimators' : [800,900,1000,1200],'learning_rate' : [0.01, 0.1]}
+    grid = {'n_estimators' : [100,300,500,600,800,1000],'learning_rate' : [0.01, 0.1,1]}
     cv = KFold(n_splits=5, shuffle=True, random_state=1)
     grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
