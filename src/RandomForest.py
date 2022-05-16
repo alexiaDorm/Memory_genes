@@ -76,7 +76,7 @@ fused = pd.concat(fused_charac)
 X = np.array(fused.drop(columns=['memory_gene']))
 y = np.array(fused['memory_gene'])
 
-grid = {'bootstrap': [True, False],
+'''grid = {'bootstrap': [True, False],
  'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
  'max_features': ['auto', 'sqrt'],
  'min_samples_leaf': [1, 2, 4],
@@ -92,17 +92,18 @@ random_search = RandomizedSearchCV(estimator = rf, param_distributions = grid, n
 #Get best param
 random_search.fit(X, y)
 best_acc, best_params = random_search.best_score_, random_search.best_params_
-print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc) 
+print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc)'''
 
 #------------------------------------------------------------------------
 #Grid search around best found parameters during random grid search
-'''rf = RandomForestRegressor(class_weight = "balanced_subsample")
-grid = {'bootstrap': [True, False],
- 'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
- 'max_features': ['auto', 'sqrt'],
- 'min_samples_leaf': [1, 2, 4],
- 'min_samples_split': [2, 5, 10],
- 'n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]}
+model = RandomForestRegressor(class_weight = "balanced_subsample")
+grid = {'bootstrap': True,
+ 'max_depth': [60, 70, 80],
+ 'max_features': 'sqrt',
+ 'min_samples_leaf': [1, 2],
+ 'min_samples_split': [2, 3, 4],
+ 'n_estimators': [100,200, 300]}
+
 cv = KFold(n_splits=5, shuffle=True, random_state=1)
 grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
@@ -113,9 +114,6 @@ grid_result = grid_search.fit(X, y)
 best_acc, best_param = grid_result.best_score_, grid_result.best_params_
 print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)  
     
-means = grid_result.cv_results_['mean_test_score']
-params = grid_result.cv_results_['params']
-    
 #Fit RandomForest with best params and evaluate clustering
 rf = RandomForestClassifier(n_estimators = best_param['n_estimators'], max_depth = best_param['max_depth'], max_features = best_param['max_features'], min_samples_leaf = best_param['min_samples_leaf'], min_samples_split  = best_param['min_samples_split'], class_weight = "balanced_subsample")
 
@@ -123,8 +121,8 @@ rf = rf.fit(X,y)
 
 clust_score = []
 for i in data_to_fuse:
-    clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], model, mult_pred=True))
+    clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], rf, mult_pred=True))
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/ADAboost_tree/ADA.csv', index=True)'''
+scores_df.to_csv('../data/binaryClass_scores/RF.csv', index=True)
