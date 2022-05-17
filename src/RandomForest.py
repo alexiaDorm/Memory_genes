@@ -76,12 +76,12 @@ fused = pd.concat(fused_charac)
 X = np.array(fused.drop(columns=['memory_gene']))
 y = np.array(fused['memory_gene'])
 
-'''grid = {'bootstrap': [True, False],
- 'max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
+grid = {'bootstrap': [True, False],
+ 'max_depth': [5, 10, 20, 30, 40, 50, 60],
  'max_features': ['auto', 'sqrt'],
- 'min_samples_leaf': [1, 2, 4],
+ 'min_samples_leaf': [2, 3, 4, 5],
  'min_samples_split': [2, 5, 10],
- 'n_estimators': [200, 400, 600, 800]}
+ 'n_estimators': [500, 600, 800, 1000, 1200]}
 
 #Random forest - hyperparameters tuning
 #Define model, random grid search space, CV
@@ -92,9 +92,9 @@ random_search = RandomizedSearchCV(estimator = rf, param_distributions = grid, n
 #Get best param
 random_search.fit(X, y)
 best_acc, best_params = random_search.best_score_, random_search.best_params_
-print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc)'''
+print('The best hyperparameters are: ', best_params, 'with accuracy: ', best_acc)
 
-#------------------------------------------------------------------------
+'''#------------------------------------------------------------------------
 #Grid search around best found parameters during random grid search
 model = RandomForestClassifier(class_weight = "balanced_subsample")
 grid = {'bootstrap': [True],
@@ -125,4 +125,4 @@ for i in data_to_fuse:
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/RF.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/RF.csv', index=True)'''
