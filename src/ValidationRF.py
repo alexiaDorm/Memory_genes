@@ -7,8 +7,7 @@ import pyreadr
 from load_data import open_charac, add_general_charac
 from binaryclass_memory import *
 import random
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 import sys
 
 
@@ -36,7 +35,8 @@ for name in names:
     
 #Add general characteristic
 for i in range(0,len(charac_matrix)):
-    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans'], axis=1)
+    charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
+    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
     charac_matrix[i] = charac_matrix[i].dropna()
     
 #Remove AE7, also keep BIDDYD15_2 for validation
@@ -63,14 +63,19 @@ for i in data_to_fuse:
 fused = pd.concat(fused_charac)
 
 #Best parameters
-best_param = {'n_estimators' : [1000],'learning_rate' : [0.1]}
+best_param = {'bootstrap': [True],
+ 'max_depth': [70],
+ 'max_features': ['sqrt'],
+ 'min_samples_leaf': [1],
+ 'min_samples_split': [2],
+ 'n_estimators': [200]}
 
 X = np.array(fused.drop(columns=['memory_gene']))
 Y = np.array(fused['memory_gene'])
 
 #Fit ADAboost with best params and evaluate clustering
-base_tree = DecisionTreeClassifier(max_depth = 14, class_weight = 'balanced')
-clf = AdaBoostClassifier(base_estimator = base_tree, n_estimators = best_param['n_estimators'], learning_rate= best_param['learning_rate'])
+clf = RandomForestClassifier(n_estimators = best_param['n_estimators'], max_depth = best_param['max_depth'], max_features = best_param['max_features'], min_samples_leaf = best_param['min_samples_leaf'], min_samples_split  = best_param['min_samples_split'], class_weight = "balanced_subsample")
+
 clf = clf.fit(X,Y)
 
 #Evaluate clustering
