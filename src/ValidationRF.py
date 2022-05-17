@@ -63,12 +63,12 @@ for i in data_to_fuse:
 fused = pd.concat(fused_charac)
 
 #Best parameters
-best_param = {'bootstrap': [True],
- 'max_depth': [70],
- 'max_features': ['sqrt'],
- 'min_samples_leaf': [1],
- 'min_samples_split': [2],
- 'n_estimators': [200]}
+best_param = {'bootstrap': True,
+ 'max_depth': 70,
+ 'max_features': 'sqrt',
+ 'min_samples_leaf': 1,
+ 'min_samples_split': 2,
+ 'n_estimators': 200}
 
 X = np.array(fused.drop(columns=['memory_gene']))
 Y = np.array(fused['memory_gene'])

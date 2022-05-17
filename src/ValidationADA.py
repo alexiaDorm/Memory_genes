@@ -63,7 +63,7 @@ for i in data_to_fuse:
 fused = pd.concat(fused_charac)
 
 #Best parameters
-best_param = {'n_estimators' : [1000],'learning_rate' : [0.1]}
+best_param = {'n_estimators' : 1000,'learning_rate' : 0.1}
 
 X = np.array(fused.drop(columns=['memory_gene']))
 Y = np.array(fused['memory_gene'])
