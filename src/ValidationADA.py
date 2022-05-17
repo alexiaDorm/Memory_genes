@@ -14,7 +14,11 @@ import sys
 
 general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
 
-names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2']
+names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2', 'CD8', 'L1210', 'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 
+        'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 
+        'LK_LSK_D2_exp3_library_d2_5', 'LSK_D2_exp1_library_LSK_d2_1', 'LSK_D2_exp1_library_LSK_d2_2', 'LSK_D2_exp1_library_LSK_d2_3',
+       'LSK_D2_exp2_library_d2A_1', 'LSK_D2_exp2_library_d2A_2', 'LSK_D2_exp2_library_d2A_3' , 'LSK_D2_exp2_library_d2A_4', 'LSK_D2_exp2_library_d2A_5', 
+       'LSK_D2_exp2_library_d2B_1','LSK_D2_exp2_library_d2B_2', 'LSK_D2_exp2_library_d2B_3', 'LSK_D2_exp2_library_d2B_4', 'LSK_D2_exp2_library_d2B_5']
 charac_matrix = []
 norm_matrix = []
 families_matrix = []
@@ -40,7 +44,7 @@ for i in range(0,len(charac_matrix)):
     charac_matrix[i] = charac_matrix[i].dropna()
     
 #Remove AE7, also keep BIDDYD15_2 for validation
-val = [8]
+val = np.arange(8,32,1)
 data_to_fuse = [0,1,3,4,5,6,7] 
 
 outliers = []
@@ -51,8 +55,10 @@ for data in charac_matrix:
     charac_matrix[i]['skew_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['skew_residuals']), normalize(charac_matrix[i]['mean_expression'])
 
 val_charac =  []
+names_val = []
 for i in val:
     val_charac.append(charac_matrix[i])
+    names_val.append(names[i])
 
 fused_charac = []
 names_fused = []
@@ -73,7 +79,7 @@ base_tree = DecisionTreeClassifier(max_depth = 14, class_weight = 'balanced')
 clf = AdaBoostClassifier(base_estimator = base_tree, n_estimators = best_param['n_estimators'], learning_rate= best_param['learning_rate'])
 clf = clf.fit(X,Y)
 
-#Evaluate clustering
+#Evaluate clustering on training set
 scores = []
 for i in data_to_fuse:
     X = np.array(charac_matrix[i].drop(columns=['memory_gene']))
@@ -96,43 +102,29 @@ for i in data_to_fuse:
     
     score.extend(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], clf, mult_pred=True, outliers = outliers[i]))
     scores.append(score)
+
+#Evaluate clustering on validation set 
+for i in val:
+    X = np.array(charac_matrix[i].drop(columns=['memory_gene']))
+    Y = np.array(charac_matrix[i]['memory_gene'])
     
-scores_df = pd.DataFrame(scores, index = names_fused, columns= ['accuracy', 'recovery memory gene', 'FP', 'precision', 'recovery', 'ensembling precision', 'ensembling recovery'])
+    #Evaluate fitted classifier
+    acc = clf.score(X, Y)
+    
+    y = clf.predict(X)
+    non_memory_gene = list(charac_matrix[i][Y == False].index)
+    memory_gene = list(charac_matrix[i][Y == True].index)
+    y = pd.DataFrame(y, index = charac_matrix[i].index, columns = ['pred'])
+
+    y_non_mem = y.loc[non_memory_gene]
+    y_mem = y.loc[memory_gene]
+    recovery = np.sum(y_mem['pred'])/len(memory_gene)
+    false_pos = np.sum(y_non_mem['pred'])
+    
+    score = [acc, recovery, false_pos]
+    
+    score.extend(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], clf, mult_pred=True, outliers = outliers[i]))
+    scores.append(score)
+    
+scores_df = pd.DataFrame(scores, index = names_fused + names_val, columns= ['accuracy', 'recovery memory gene', 'FP', 'precision', 'recovery', 'ensembling precision', 'ensembling recovery'])
 scores_df.to_csv('../data/binaryClass_scores/bestADA.csv', index=True)
-
-mean_score = np.mean(scores, axis = 0)
-print('Training scores')
-print('accuracy: ', mean_score[0])
-print('recovery memory genes: ', mean_score[1])
-print('false postive: ', mean_score[2])
-print('100 clustering precision: ', mean_score[3])
-print('100 clustering recovery: ', mean_score[4])
-
-print('-----------------')
-print('Validation scores')
-
-X = np.array(charac_matrix[8].drop(columns=['memory_gene']))
-Y = np.array(charac_matrix[8]['memory_gene'])
-    
-#Evaluate fitted classifier
-acc = clf.score(X, Y)
-    
-y = clf.predict(X)
-non_memory_gene = list(charac_matrix[8][Y == False].index)
-memory_gene = list(charac_matrix[8][Y == True].index)
-y = pd.DataFrame(y, index = charac_matrix[8].index, columns = ['pred'])
-
-y_non_mem = y.loc[non_memory_gene]
-y_mem = y.loc[memory_gene]
-recovery = np.sum(y_mem['pred'])/len(memory_gene)
-false_pos = np.sum(y_non_mem['pred'])
-    
-score = [acc, recovery, false_pos]
-    
-score.extend(predict_evaluate(charac_matrix[8], norm_matrix[8], families_matrix[8], clf, mult_pred=True, outliers=outliers[8]))
-
-print('accuracy: ', score[0])
-print('recovery memory genes: ', score[1])
-print('false postive: ', score[2])
-print('100 clustering precision: ', score[3])
-print('100 clustering recovery: ', score[4])
