@@ -103,7 +103,7 @@ for i in data_to_fuse:
     scores.append(score)
     
 scores_df = pd.DataFrame(scores, index = names_fused, columns= ['accuracy', 'recovery memory gene', 'FP', 'precision', 'recovery', 'ensembling precision', 'ensembling recovery'])
-scores_df.to_csv('../data/binaryClass_scores/bestADA.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/bestRF.csv', index=True)
 
 mean_score = np.mean(scores, axis = 0)
 print('Training scores')
