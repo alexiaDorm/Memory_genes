@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="LogFS_MI"
-#SBATCH --error="LogFS_MI.err"
+#SBATCH --job-name="LogFS_F"
+#SBATCH --error="LogFS_F.err"
 #SBATCH --output="LogFS_MI.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
