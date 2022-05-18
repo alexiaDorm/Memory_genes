@@ -77,7 +77,7 @@ y = fused['memory_gene']
 #Select relevant features
 best_acc, best_param, best_feat = 0, 0, []
 for i in range (2, X.shape[1] + 1):
-    selector = SelectKBest(f_classif, k=i)
+    selector = SelectKBest(mutual_info_classif, k=i)
     X_redu = selector.fit_transform(X, y)
 
     #Grid search around best found parameters during random grid search
@@ -98,7 +98,7 @@ for i in range (2, X.shape[1] + 1):
         cols = selector.get_support(indices=True)
         best_feat = X.iloc[:,cols].columns.tolist()
 
-print('ANOVA F statistic FS: features used = ', best_feat, 'with C = ', best_param['C'], 'and accuracy = ', best_acc)
+print('Mutual info FS: features used = ', best_feat, 'with C = ', best_param['C'], 'and accuracy = ', best_acc)
 #Fit Logreg with best params and evaluate clustering
 model = LogisticRegression(C = best_param['C'], class_weight = "balanced_subsample")
 model = model.fit(X,y)
@@ -109,4 +109,4 @@ for i in data_to_fuse:
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/LogFS_F.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/LogFS_MI.csv', index=True)
