@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import sklearn
 import pyreadr
 from sklearn.linear_model import LogisticRegression
-from sklearn.feature_selection import SelectKBest, SelectPercentile, mutual_info_classif
+from sklearn.feature_selection import SelectKBest, mutual_info_classif,f_classif
 from sklearn.model_selection import KFold, GridSearchCV
 from load_data import open_charac
 from binaryclass_memory import *
