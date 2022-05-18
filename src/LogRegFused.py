@@ -82,7 +82,7 @@ for i in range (2, X.shape[1] + 1):
 
     #Grid search around best found parameters during random grid search
     model = LogisticRegression(class_weight = "balanced_subsample")
-    grid = {'C': np.linspace(-9,5,14)}
+    grid = {'C': np.logspace(-9,5,14)}
 
     cv = KFold(n_splits=5, shuffle=True, random_state=1)
     grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
