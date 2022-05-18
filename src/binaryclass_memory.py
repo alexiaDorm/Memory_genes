@@ -40,7 +40,7 @@ def visualize_charac(data:pd.DataFrame):
     plt.xlabel("skew")
     plt.ylabel("mean expression")
     plt.xlim(-40,60)
-    #plt.yscale('log')
+    plt.yscale('log')
     plt.title("All genes")
     plt.show()
 
