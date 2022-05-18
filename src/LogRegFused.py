@@ -77,7 +77,7 @@ y = np.array(fused['memory_gene'])
 #Select relevant features
 best_acc, best_param = 0, 0
 for i in range (2, X.shape[1] + 1):
-    selector = SelectKBest(f_classif, k=i)
+    selector = SelectKBest(mutual_info_classif, k=i)
     X_redu = selector.fit_transform(X, y)
 
     #Grid search around best found parameters during random grid search
