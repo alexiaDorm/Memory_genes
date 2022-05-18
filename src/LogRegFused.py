@@ -71,11 +71,11 @@ for i in data_to_fuse:
     name_fused.append(names[i])
     
 fused = pd.concat(fused_charac)   
-X = np.array(fused.drop(columns=['memory_gene']))
-y = np.array(fused['memory_gene'])     
+X = fused.drop(columns=['memory_gene'])
+y = fused['memory_gene']     
 
 #Select relevant features
-best_acc, best_param = 0, 0
+best_acc, best_param, best_feat = 0, 0, []
 for i in range (2, X.shape[1] + 1):
     selector = SelectKBest(f_classif, k=i)
     X_redu = selector.fit_transform(X, y)
@@ -95,7 +95,10 @@ for i in range (2, X.shape[1] + 1):
     
     if acc > best_acc:
         best_acc, best_param = acc, grid_result.best_params_
-    
+        cols = selector.get_support(indices=True)
+        best_feat = X.iloc[:,cols].columns.tolist()
+
+print('ANOVA F statistic FS: features used = ', best_feat, 'with C = ', best_param['C'], 'and accuracy = ', best_acc)
 #Fit Logreg with best params and evaluate clustering
 model = LogisticRegression(C = best_param['C'], class_weight = "balanced_subsample")
 model = model.fit(X,y)
