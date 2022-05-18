@@ -82,7 +82,7 @@ for i in range (2, X.shape[1] + 1):
 
     #Grid search around best found parameters during random grid search
     model = LogisticRegression(class_weight = "balanced_subsample")
-    grid = {'C': np.logspace(-9,5,14)}
+    grid = {'C': np.logspace(-10, 3, 14)}
 
     cv = KFold(n_splits=5, shuffle=True, random_state=1)
     grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
@@ -98,7 +98,7 @@ for i in range (2, X.shape[1] + 1):
         cols = selector.get_support(indices=True)
         best_feat = X.iloc[:,cols].columns.tolist()
 
-print('Mutual info FS: features used = ', best_feat, 'with C = ', best_param['C'], 'and accuracy = ', best_acc)
+print('F_stat FS: features used = ', best_feat, 'with C = ', best_param['C'], 'and accuracy = ', best_acc)
 #Fit Logreg with best params and evaluate clustering
 model = LogisticRegression(C = best_param['C'], class_weight = "balanced_subsample")
 model = model.fit(X,y)
