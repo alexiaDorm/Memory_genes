@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import sklearn
 import pyreadr
 from sklearn.linear_model import LogisticRegression
+from sklearn.feature_selection import SelectKBest, SelectPercentile, mutual_info_classif
 
 from load_data import open_charac
 from binaryclass_memory import *
@@ -69,24 +70,31 @@ for i in data_to_fuse:
     fused_charac.append(charac_matrix[i])
     name_fused.append(names[i])
     
-fused = pd.concat(fused_charac)
+fused = pd.concat(fused_charac)   
 X = np.array(fused.drop(columns=['memory_gene']))
-y = np.array(fused['memory_gene'])       
+y = np.array(fused['memory_gene'])     
 
+#Select relevant features
+best_acc, best_param = 0, 0
+for i in range (2, X.shape[1] + 1):
+    selector = SelectKBest(mutual_info_classif, k=i)
+    X_redu = selector.fit_transform(X, y)
 
-#Grid search around best found parameters during random grid search
-model = LogisticRegression(class_weight = "balanced_subsample")
-grid = {'C': np.linspace(-9,5,14)}
+    #Grid search around best found parameters during random grid search
+    model = LogisticRegression(class_weight = "balanced_subsample")
+    grid = {'C': np.linspace(-9,5,14)}
 
-cv = KFold(n_splits=5, shuffle=True, random_state=1)
-grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
+    cv = KFold(n_splits=5, shuffle=True, random_state=1)
+    grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
+
+    #Grid search
+    grid_result = grid_search.fit(X_redu, y)
+
+    #Get cv accuracy
+    acc = grid_result.best_score_
     
-#Grid search
-grid_result = grid_search.fit(X, y)
-    
-#Get best scores
-best_acc, best_param = grid_result.best_score_, grid_result.best_params_
-print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)  
+    if acc > best_acc:
+        best_acc, best_param = acc, grid_result.best_params_
     
 #Fit Logreg with best params and evaluate clustering
 model = LogisticRegression(C = best_param['C'], class_weight = "balanced_subsample")
@@ -98,4 +106,4 @@ for i in data_to_fuse:
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/Log.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/LogFS_MI.csv', index=True)
