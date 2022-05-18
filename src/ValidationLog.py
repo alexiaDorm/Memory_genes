@@ -41,7 +41,7 @@ for i in range(0,len(charac_matrix)):
     
 #Remove AE7, also keep BIDDYD15_2 for validation
 val = np.arange(8,32,1)
-val.append(0)
+val = np.append(val,0)
 data_to_fuse = [1,3,4,5,6,7] 
 
 outliers = []

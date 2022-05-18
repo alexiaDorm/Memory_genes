@@ -50,8 +50,8 @@ for i in range(0,len(charac_matrix)):
     charac_matrix[i] = charac_matrix[i].dropna()
     
 #Remove AE7, also keep BIDDYD15_2 for validation
-val = [8]
-data_to_fuse = [0,1,3,4,5,6,7]
+val = [0,8]
+data_to_fuse = [1,3,4,5,6,7]
 
 for data in charac_matrix:
     #Normalize skew_residuals, same for mean_expression after removing outliers
@@ -68,33 +68,38 @@ for i in data_to_fuse:
     name_fused.append(names[i])
     
 fused = pd.concat(fused_charac)
-
-#Oversample the memory genes data points
-ros = RandomOverSampler(random_state=42)
-labels = fused['memory_gene']
-X = fused.drop(columns=['memory_gene'])        
-X, labels = ros.fit_resample(X,labels)
-fused = pd.concat([X, labels], axis=1) 
+X = np.array(fused.drop(columns=['memory_gene']))
+y = np.array(fused['memory_gene'])       
 
 
-#Grid search of penalty values
-#L2 regularization
-scores_name = ['accuracy', 'recovery', 'FP', 'Clustering precision', 'Clustering recovery']
-C = np.logspace(-10, 3, 14)
-scores_grid = []
-for lamb in C:
-    clf, scores = fit_evaluate_all(fused, 'logreg', lamb = lamb, verbose = False)
+#Grid search around best found parameters during random grid search
+model = RandomForestClassifier(class_weight = "balanced_subsample")
+grid = {'bootstrap': [True],
+ 'max_depth': [60, 70, 80],
+ 'max_features': ['sqrt'],
+ 'min_samples_leaf': [1, 2],
+ 'min_samples_split': [2, 3, 4],
+ 'n_estimators': [100,200, 300]}
+
+cv = KFold(n_splits=5, shuffle=True, random_state=1)
+grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
     
-    #Evaluate clustering
-    clust_score = []
-    for i in data_to_fuse:
-        clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], clf))
-    scores.extend([np.nanmean(np.array(clust_score)[:,0]), np.nanmean(np.array(clust_score)[:,1])])
-    scores_grid.append(scores)
+#Grid search
+grid_result = grid_search.fit(X, y)
     
-    #Save individual clustering results
-    scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery'])
-    scores_df.to_csv('../data/binaryClass_scores/LogRegfused/' + str(lamb) + 'few.csv', index=True)
+#Get best scores
+best_acc, best_param = grid_result.best_score_, grid_result.best_params_
+print('The best hyperparameters are: ', best_param, 'with accuracy: ', best_acc)  
     
-scores_df = pd.DataFrame(scores_grid, index = C, columns= scores_name)
-scores_df.to_csv('../data/binaryClass_scores/LogRegfused/fusedfew.csv', index=True)
+#Fit RandomForest with best params and evaluate clustering
+rf = RandomForestClassifier(n_estimators = best_param['n_estimators'], max_depth = best_param['max_depth'], max_features = best_param['max_features'], min_samples_leaf = best_param['min_samples_leaf'], min_samples_split  = best_param['min_samples_split'], class_weight = "balanced_subsample")
+
+rf = rf.fit(X,y)
+
+clust_score = []
+for i in data_to_fuse:
+    clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], rf, mult_pred=True))
+    
+#Save individual clustering results
+scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
+scores_df.to_csv('../data/binaryClass_scores/RF.csv', index=True)'''
