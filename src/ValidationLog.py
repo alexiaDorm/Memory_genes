@@ -79,7 +79,7 @@ clf = LogisticRegression(C = lamb, class_weight = 'balanced', max_iter=10000).fi
 #Evaluate clustering
 scores = []
 for i in data_to_fuse:
-    X = np.array(charac_matrix[i].drop(columns=['memory_gene']))
+    X = np.array(charac_matrix[i][FS])
     Y = np.array(charac_matrix[i]['memory_gene'])
     
     #Evaluate fitted classifier
@@ -102,7 +102,7 @@ for i in data_to_fuse:
 
 #Evaluate clustering on validation set 
 for i in val:
-    X = np.array(charac_matrix[i].drop(columns=['memory_gene']))
+    X = np.array(charac_matrix[i][FS])
     Y = np.array(charac_matrix[i]['memory_gene'])
     
     #Evaluate fitted classifier
