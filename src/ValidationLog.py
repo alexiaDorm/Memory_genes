@@ -37,7 +37,8 @@ for name in names:
     
 #Add general characteristic
 for i in range(0,len(charac_matrix)):
-    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans'], axis=1)
+    charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
+    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
     charac_matrix[i] = charac_matrix[i].dropna()
     
 #Remove AE7, also keep BIDDYD15_2 for validation
@@ -67,9 +68,10 @@ for i in data_to_fuse:
 fused = pd.concat(fused_charac)
 
 #Best parameters
-lamb = 0.0000001
+lamb = 100
+FS = ['skew_residuals', 'mean_expression', 'length', 'GC', 'Myc', 'Nanog', 'Sox2', 'H3K4me3', 'H3K27ac', 'Ctnnb1', 'Srebf1']
 
-X = np.array(fused.drop(columns=['memory_gene']))
+X = np.array(fused[FS])
 Y = np.array(fused['memory_gene'])
 
 clf = LogisticRegression(C = lamb, class_weight = 'balanced', max_iter=10000).fit(X,Y)
@@ -122,4 +124,4 @@ for i in val:
     scores.append(score)
     
 scores_df = pd.DataFrame(scores, index = names_fused + names_val, columns= ['accuracy', 'recovery memory gene', 'FP', 'precision', 'recovery', 'ensembling precision', 'ensembling recovery'])
-scores_df.to_csv('../data/binaryClass_scores/bestLog.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/bestLogFS.csv', index=True)
