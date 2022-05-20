@@ -85,7 +85,7 @@ for i in range (2, X.shape[1] + 1):
     grid = {'C': np.logspace(-10, 3, 14)}
 
     cv = KFold(n_splits=5, shuffle=True, random_state=1)
-    grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='accuracy')
+    grid_search = GridSearchCV(estimator=model, param_grid=grid, n_jobs=-1, cv=cv, scoring='balanced_accuracy')
 
     #Grid search
     grid_result = grid_search.fit(X_redu, y)
@@ -109,4 +109,4 @@ for i in data_to_fuse:
     
 #Save individual clustering results
 scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
-scores_df.to_csv('../data/binaryClass_scores/LogFS_MI.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/LogFS.csv', index=True)
