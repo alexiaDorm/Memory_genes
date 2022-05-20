@@ -70,6 +70,7 @@ fused = pd.concat(fused_charac)
 #Best parameters
 lamb = 100
 FS = ['skew_residuals', 'mean_expression', 'length', 'GC', 'Myc', 'Nanog', 'Sox2', 'H3K4me3', 'H3K27ac', 'Ctnnb1', 'Srebf1']
+all_feat = ['skew_residuals', 'mean_expression', 'length', 'GC', 'Myc', 'Nanog', 'Sox2', 'H3K4me3', 'H3K27ac', 'Ctnnb1', 'Srebf1', 'memory_gene']
 
 X = np.array(fused[FS])
 Y = np.array(fused['memory_gene'])
@@ -97,7 +98,7 @@ for i in data_to_fuse:
     
     score = [acc, recovery, false_pos]
     
-    score.extend(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], clf, mult_pred=True, outliers = outliers[i]))
+    score.extend(predict_evaluate(charac_matrix[i][all_feat], norm_matrix[i], families_matrix[i], clf, mult_pred=True, outliers = outliers[i]))
     scores.append(score)
 
 #Evaluate clustering on validation set 
@@ -120,7 +121,7 @@ for i in val:
     
     score = [acc, recovery, false_pos]
     
-    score.extend(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], clf, mult_pred=True, outliers = outliers[i]))
+    score.extend(predict_evaluate(charac_matrix[i][all_feat], norm_matrix[i], families_matrix[i], clf, mult_pred=True, outliers = outliers[i]))
     scores.append(score)
     
 scores_df = pd.DataFrame(scores, index = names_fused + names_val, columns= ['accuracy', 'recovery memory gene', 'FP', 'precision', 'recovery', 'ensembling precision', 'ensembling recovery'])
