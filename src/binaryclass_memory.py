@@ -271,7 +271,7 @@ def load_charac():
 
 class NN_1l(nn.Module):
     def __init__(self, n_inputs, params=None):
-        super(NN, self).__init__()
+        super(NN_1l, self).__init__()
         self.layer = nn.Linear(n_inputs, 1)
         nn.init.xavier_uniform_(self.layer.weight)
  
