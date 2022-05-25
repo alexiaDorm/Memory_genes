@@ -247,6 +247,7 @@ def load_charac():
     val = [8]
     data_to_fuse = [0,1,3,4,5,6,7]
 
+    outliers = []
     for i in range(0,len(charac_matrix)):
         #Normalize skew_residuals, same for mean_expression after removing outliers
         charac_matrix[i], outlier_temp = remove_extreme_values(charac_matrix[i], k=200)
@@ -257,6 +258,7 @@ def load_charac():
     val_charac =  []
     for i in val:
         val_charac.append(charac_matrix[i])
+    
     fused_charac = []
     name_fused = []
     for i in data_to_fuse:
