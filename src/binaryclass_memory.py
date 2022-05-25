@@ -280,7 +280,7 @@ class NN_1l(nn.Module):
         return X
     
 def train_model(train_dl, model, criterion, optimizer):
-    for epoch in range(200):
+    for epoch in range(25):
         # enumerate mini batches
         for i, (inputs, targets) in enumerate(train_dl):
             #Convert double to float
