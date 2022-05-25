@@ -279,6 +279,56 @@ class NN_1l(nn.Module):
         X = self.layer(X)
         return X
     
+class NN_2l(nn.Module):
+    def __init__(self, n_inputs, params=None):
+        super(NN_2l, self).__init__()
+        self.layer_1 = nn.Linear(n_inputs, params['n1']) 
+        self.relu = nn.ReLU()
+        self.layer_out = nn.Linear(params['n1'], 1)
+ 
+    def forward(self, X):
+        X = self.relu(self.layer_1(X))
+        X = self.layer_out(X)
+        
+        return X
+    
+class NN_3l(nn.Module):
+    def __init__(self, n_inputs, params=None):
+        super(NN_3l, self).__init__()
+        self.layer_1 = nn.Linear(n_inputs, params['n1']) 
+        self.relu1 = nn.ReLU()
+        self.layer_2 = nn.Linear(params['n1'], params['n2'])
+        self.relu2 == nn.ReLU()
+        self.layer_out = nn.Linear(params['n2'], 1)
+        
+ 
+    def forward(self, X):
+        X = self.relu1(self.layer_1(X))
+        X = self.relu2(self.layer_2(X))
+        X = self.layer_out(X)
+        
+        return X
+    
+class NN_4l(nn.Module):
+    def __init__(self, n_inputs, params=None):
+        super(NN_4l, self).__init__()
+        self.layer_1 = nn.Linear(n_inputs, params['n1']) 
+        self.relu1 = nn.ReLU()
+        self.layer_2 = nn.Linear(params['n1'], params['n2'])
+        self.relu2 == nn.ReLU()
+        self.layer_3 = nn.Linear(params['n2'], params['n3'])
+        self.relu3 == nn.ReLU()
+        self.layer_out = nn.Linear(params['n3'], 1)
+        
+ 
+    def forward(self, X):
+        X = self.relu1(self.layer_1(X))
+        X = self.relu2(self.layer_2(X))
+        X = self.relu3(self.layer_3(X))
+        X = self.layer_out(X)
+        
+        return X
+    
 def train_model(train_dl, model, criterion, optimizer):
     for epoch in range(25):
         # enumerate mini batches
@@ -319,7 +369,9 @@ def obj(trial, fused):
     params = {
               'learning_rate': trial.suggest_loguniform('learning_rate', 1e-8, 100),
               'weight_decay' : trial.suggest_loguniform('weight_decay', 1e-5, 1),
-              'n': trial.suggest_int("n", 4, 50),
+              'n1': trial.suggest_int("n1", 4, 50),
+              'n2' : trial.suggest_int("n2", 4, 50), 
+              #'n3' : trial.suggest_int("n3", 4, 50),
               #'batch_size': trial.suggest_int("batch_size", 5, 8), #2^i
               'nb_features' : trial.suggest_int("nb_features", 2, 18)
               }
@@ -335,7 +387,7 @@ def obj(trial, fused):
 
     train_dl, test_dl = load_data(fused[FS],params)
 
-    model = NN_1l(len(FS)-1, params)
+    model = NN_2l(len(FS)-1, params)
 
     #Optmization criterion and optimizer
     num_positives= np.sum(y); num_negatives = len(y) - num_positives

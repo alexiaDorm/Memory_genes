@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="LogFS"
-#SBATCH --error="LogFS.err"
-#SBATCH --output="LogFS.out"
+#SBATCH --job-name="NN2l"
+#SBATCH --error="NN2l.err"
+#SBATCH --output="NN2l.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python LogRegFused.py 
+srun python NNopt.py 
  
 echo FINISHED at `date`
 
