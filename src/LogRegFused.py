@@ -77,8 +77,6 @@ fused = pd.concat(fused_charac)
 X = fused.drop(columns=['memory_gene'])
 y = fused['memory_gene']     
 
-
-
 #Select relevant features
 best_acc, best_param, best_feat = 0, 0, []
 for i in range (2, X.shape[1] + 1):
