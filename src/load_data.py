@@ -256,7 +256,14 @@ def add_general_charac(charac:pd.DataFrame, general_charac:pd.DataFrame):
     general = general_charac.loc[genes_interest]
     general = general.drop(columns=['gene_ID', 'transcript_ID', 'name', 'chr', 'start', 'end', 'TSS', 'strand'])
     
-    charac = pd.concat([charac,general], axis=1)
+    #Encode features as binary
+    TF = general.drop(columns=['length','GC'])
+    TF =  np.where(TF > 0, 1, 0)
+    TF = pd.DataFrame(TF, index=general.index, columns= (general.drop(columns=['length','GC'])).columns)
+    
+    general = general[['length', 'GC']]
+    
+    charac = pd.concat([charac,general,TF], axis=1)
    
     return charac
 
@@ -277,8 +284,8 @@ def open_charac(charac_output_path:str, p_value_path:str, k:float):
     return charac
 
 def normalize(data:np.array):
-    #Normlize into 0 to 100 range
-    return ((data - min(data))/ (max(data) - min(data))) * 100
+    #Normlize into 0 to 1 range
+    return ((data - min(data))/ (max(data) - min(data)))
 
 def remove_extreme_values(data:pd.DataFrame, k:float=3):
     '''Remove all extreme values of gene expression using Interquartile Range Method. Return the name of the gene with extreme values.
