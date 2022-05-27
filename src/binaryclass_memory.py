@@ -368,6 +368,28 @@ class NN_3lBN(nn.Module):
         
         return X
     
+class NN_4lBN(nn.Module):
+    def __init__(self, n_inputs, params=None):
+        super(NN_4lBN, self).__init__()
+        self.layers = nn.Sequential(
+        nn.Linear(n_inputs, params['n1']), 
+        nn.BatchNorm1d(params['n1']),
+        nn.ReLU(),
+        nn.Linear(params['n1'], params['n2']),
+        nn.BatchNorm1d(params['n2']),
+        nn.ReLU(),
+        nn.Linear(params['n2'], params['n3']),
+        nn.BatchNorm1d(params['n3']),
+        nn.ReLU(),
+        nn.Linear(params['n3'], 1)
+        )
+        
+ 
+    def forward(self, X):
+        X = self.layers(X)
+        
+        return X
+    
 def train_model(train_dl, model, criterion, optimizer):
     for epoch in range(70):
         # enumerate mini batches
@@ -427,7 +449,7 @@ def obj(trial, fused):
 
     train_dl, test_dl = load_data(fused[FS],params)
 
-    model = NN_5l(len(FS)-1, params)
+    model = NN_3lBN(len(FS)-1, params)
 
     #Optmization criterion and optimizer
     num_positives= np.sum(y); num_negatives = len(y) - num_positives
