@@ -282,50 +282,50 @@ class NN_1l(nn.Module):
 class NN_2l(nn.Module):
     def __init__(self, n_inputs, params=None):
         super(NN_2l, self).__init__()
-        self.layer_1 = nn.Linear(n_inputs, params['n1']) 
-        self.relu = nn.ReLU()
-        self.layer_out = nn.Linear(params['n1'], 1)
+        self.layers = nn.Sequential(
+        nn.Linear(n_inputs, params['n1']),
+        nn.ReLU(),
+        nn.Linear(params['n1'], 1)
+        )
  
     def forward(self, X):
-        X = self.relu(self.layer_1(X))
-        X = self.layer_out(X)
+        X = self.layers(x)
         
         return X
     
 class NN_3l(nn.Module):
     def __init__(self, n_inputs, params=None):
         super(NN_3l, self).__init__()
-        self.layer_1 = nn.Linear(n_inputs, params['n1']) 
-        self.relu1 = nn.ReLU()
-        self.layer_2 = nn.Linear(params['n1'], params['n2'])
-        self.relu2 == nn.ReLU()
-        self.layer_out = nn.Linear(params['n2'], 1)
+        self.layers = nn.Sequential(
+        nn.Linear(n_inputs, params['n1']), 
+        nn.ReLU(),
+        nn.Linear(params['n1'], params['n2']),
+        nn.ReLU(),
+        nn.Linear(params['n2'], 1)
+        )
         
  
     def forward(self, X):
-        X = self.relu1(self.layer_1(X))
-        X = self.relu2(self.layer_2(X))
-        X = self.layer_out(X)
+        X = self.layers(X)
         
         return X
     
 class NN_4l(nn.Module):
     def __init__(self, n_inputs, params=None):
         super(NN_4l, self).__init__()
-        self.layer_1 = nn.Linear(n_inputs, params['n1']) 
-        self.relu1 = nn.ReLU()
-        self.layer_2 = nn.Linear(params['n1'], params['n2'])
-        self.relu2 == nn.ReLU()
-        self.layer_3 = nn.Linear(params['n2'], params['n3'])
-        self.relu3 == nn.ReLU()
-        self.layer_out = nn.Linear(params['n3'], 1)
+        self.layers = nn.Sequential(
+        nn.Linear(n_inputs, params['n1']) ,
+        nn.ReLU(),
+        nn.Linear(params['n1'], params['n2']),
+        nn.ReLU(),
+        nn.Linear(params['n2'], params['n3']),
+        nn.ReLU(),
+        nn.Linear(params['n3'], 1)
+        )
         
  
     def forward(self, X):
-        X = self.relu1(self.layer_1(X))
-        X = self.relu2(self.layer_2(X))
-        X = self.relu3(self.layer_3(X))
-        X = self.layer_out(X)
+        X = self.layers(X)
         
         return X
     
@@ -370,8 +370,8 @@ def obj(trial, fused):
               'learning_rate': trial.suggest_loguniform('learning_rate', 1e-8, 100),
               'weight_decay' : trial.suggest_loguniform('weight_decay', 1e-5, 1),
               'n1': trial.suggest_int("n1", 4, 50),
-              'n2' : trial.suggest_int("n2", 4, 50), 
-              'n3' : trial.suggest_int("n3", 4, 50),
+              #'n2' : trial.suggest_int("n2", 4, 50), 
+              #'n3' : trial.suggest_int("n3", 4, 50),
               #'batch_size': trial.suggest_int("batch_size", 5, 8), #2^i
               'nb_features' : trial.suggest_int("nb_features", 2, 18)
               }
@@ -380,14 +380,14 @@ def obj(trial, fused):
     y = fused['memory_gene']*1
     
     #Get the N top features according to mutual information
-    selector = SelectKBest(mutual_info_classif, k=params['nb_features'])
+    selector = SelectKBest(mutual_info_classif, k=2)
     X_redu = selector.fit_transform(X, y)
     cols = selector.get_support(indices=True)
-    FS = X.iloc[:,cols].columns.tolist(); FS.append('memory_gene')
+    FS = X.iloc[:,cols].columns.tolist();FS.append('CV2ofmeans_residuals'); FS.append('memory_gene'); FS = np.unique(FS)
 
     train_dl, test_dl = load_data(fused[FS],params)
 
-    model = NN_4l(len(FS)-1, params)
+    model = NN_2l(len(FS)-1, params)
 
     #Optmization criterion and optimizer
     num_positives= np.sum(y); num_negatives = len(y) - num_positives

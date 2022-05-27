@@ -111,5 +111,5 @@ for i in data_to_fuse:
     clust_score.append(predict_evaluate(charac_matrix[i], norm_matrix[i], families_matrix[i], model, mult_pred=True))
     
 #Save individual clustering results
-scores_df = pd.DataFrame(clust_score, index = name_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
+scores_df = pd.DataFrame(clust_score, index = names_fused, columns= ['precision', 'recovery','100 precision', '100 recovery'])
 scores_df.to_csv('../data/binaryClass_scores/LogFS.csv', index=True)
