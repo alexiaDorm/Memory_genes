@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NN3lRBN"
-#SBATCH --error="NN3lRBN.err"
-#SBATCH --output="NN3lRBN.out"
+#SBATCH --job-name="NN4lRBN"
+#SBATCH --error="NN4lRBN.err"
+#SBATCH --output="NN4lRBN.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
