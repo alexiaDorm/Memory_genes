@@ -219,7 +219,7 @@ def load_data (fused:pd.DataFrame, params):
     N = len(y)
     train, test = random_split(dataset, [math.floor(N*0.8), math.ceil(N*0.2)], generator=torch.Generator().manual_seed(42))
     train_dl = DataLoader(train, batch_size= 32, shuffle=True)
-    test_dl = DataLoader(test, batch_size=1024, shuffle=False)
+    test_dl = DataLoader(test, batch_size=32, shuffle=True)
     
     return train_dl, test_dl
 
@@ -329,6 +329,26 @@ class NN_4l(nn.Module):
         
         return X
     
+class NN_5l(nn.Module):
+    def __init__(self, n_inputs, params=None):
+        super(NN_5l, self).__init__()
+        self.layers = nn.Sequential(
+        nn.Linear(n_inputs, params['n1']), 
+        nn.ReLU(),
+        nn.Linear(params['n1'], params['n2']),
+        nn.ReLU(),
+        nn.Linear(params['n2'], params['n3']), 
+        nn.ReLU(),
+        nn.Linear(params['n3'], params['n4']), 
+        nn.ReLU(),
+        nn.Linear(params['n4'], 1)
+        )
+ 
+    def forward(self, X):
+        X = self.layers(X)
+        
+        return X
+    
 def train_model(train_dl, model, criterion, optimizer):
     for epoch in range(70):
         # enumerate mini batches
@@ -372,6 +392,7 @@ def obj(trial, fused):
               'n1': trial.suggest_int("n1", 4, 50),
               'n2' : trial.suggest_int("n2", 4, 50), 
               'n3' : trial.suggest_int("n3", 4, 50),
+              'n4': trial.suggest_int("n4", 4, 50),
               #'batch_size': trial.suggest_int("batch_size", 5, 8), #2^i
               'nb_features' : trial.suggest_int("nb_features", 2, 18)
               }
@@ -387,7 +408,7 @@ def obj(trial, fused):
 
     train_dl, test_dl = load_data(fused[FS],params)
 
-    model = NN_4l(len(FS)-1, params)
+    model = NN_5l(len(FS)-1, params)
 
     #Optmization criterion and optimizer
     num_positives= np.sum(y); num_negatives = len(y) - num_positives
