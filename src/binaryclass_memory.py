@@ -473,7 +473,7 @@ def obj(trial, fused):
               'weight_decay' : trial.suggest_loguniform('weight_decay', 1e-8, 1e-2),
               'n1': trial.suggest_int("n1", 4, 50),
               'n2' : trial.suggest_int("n2", 4, 50), 
-              'n3' : trial.suggest_int("n3", 4, 50),
+              #'n3' : trial.suggest_int("n3", 4, 50),
               #'n4': trial.suggest_int("n4", 4, 50),
               #'batch_size': trial.suggest_int("batch_size", 5, 8), #2^i
               'nb_features' : trial.suggest_int("nb_features", 2, 18)
@@ -490,7 +490,7 @@ def obj(trial, fused):
 
     train_dl, test_dl = load_data(fused[FS],params)
 
-    model = NN_4lRBN(len(FS)-1, params)
+    model = NN_3lRBN(len(FS)-1, params)
 
     #Optmization criterion and optimizer
     num_positives= np.sum(y); num_negatives = len(y) - num_positives
