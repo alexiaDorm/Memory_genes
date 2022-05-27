@@ -367,10 +367,10 @@ def predict(inputs, model):
 def obj(trial, fused):
     #Set hyperparamters to tune
     params = {
-              'learning_rate': trial.suggest_loguniform('learning_rate', 1e-8, 100),
+              'learning_rate': trial.suggest_loguniform('learning_rate', 1e-8, 1),
               'weight_decay' : trial.suggest_loguniform('weight_decay', 1e-5, 1),
               'n1': trial.suggest_int("n1", 4, 50),
-              #'n2' : trial.suggest_int("n2", 4, 50), 
+              'n2' : trial.suggest_int("n2", 4, 50), 
               #'n3' : trial.suggest_int("n3", 4, 50),
               #'batch_size': trial.suggest_int("batch_size", 5, 8), #2^i
               'nb_features' : trial.suggest_int("nb_features", 2, 18)
@@ -387,7 +387,7 @@ def obj(trial, fused):
 
     train_dl, test_dl = load_data(fused[FS],params)
 
-    model = NN_2l(len(FS)-1, params)
+    model = NN_3l(len(FS)-1, params)
 
     #Optmization criterion and optimizer
     num_positives= np.sum(y); num_negatives = len(y) - num_positives
