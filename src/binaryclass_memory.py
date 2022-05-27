@@ -393,7 +393,7 @@ def obj(trial, fused):
     num_positives= np.sum(y); num_negatives = len(y) - num_positives
     pos_weight  = torch.as_tensor(num_negatives / num_positives, dtype=torch.float)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
-    optimizer = SGD(model.parameters(), lr=params['learning_rate'], momentum=0.9, weight_decay=params['weight_decay'])
+    optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'], weight_decay=params['weight_decay'])
 
     #Train and evaluate the NN
     train_model(train_dl, model, criterion, optimizer)
