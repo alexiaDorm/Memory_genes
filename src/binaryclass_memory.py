@@ -219,7 +219,7 @@ def load_data (fused:pd.DataFrame, params):
     N = len(y)
     train, test = random_split(dataset, [math.floor(N*0.8), math.ceil(N*0.2)], generator=torch.Generator().manual_seed(42))
     train_dl = DataLoader(train, batch_size= 32, shuffle=True)
-    test_dl = DataLoader(test, batch_size=32, shuffle=True)
+    test_dl = DataLoader(test, batch_size=256, shuffle=True)
     
     return train_dl, test_dl
 
