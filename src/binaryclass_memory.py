@@ -289,7 +289,7 @@ class NN_2l(nn.Module):
         )
  
     def forward(self, X):
-        X = self.layers(x)
+        X = self.layers(X)
         
         return X
     
@@ -387,7 +387,7 @@ def obj(trial, fused):
 
     train_dl, test_dl = load_data(fused[FS],params)
 
-    model = NN_2l(len(FS)-1, params)
+    model = NN_3l(len(FS)-1, params)
 
     #Optmization criterion and optimizer
     num_positives= np.sum(y); num_negatives = len(y) - num_positives
