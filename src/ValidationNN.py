@@ -25,7 +25,7 @@ model = train_best_model(fused, params)
 
 #Get the N top features according to mutual information
 X, y = fused.drop(columns=['memory_gene']), fused['memory_gene']
-FS = FS(X,y,params)
+FS = feature_selection(X,y,params)
 
 #Evaluate clustering
 scores = []
