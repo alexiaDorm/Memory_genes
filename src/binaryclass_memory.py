@@ -460,11 +460,11 @@ def evaluate_model(test_dl, model):
     return np.mean(acc)
 
 def predict(inputs, model):
-    inputs =torch.Tensor([inputs])
+    inputs = torch.from_numpy(inputs); inputs = inputs.to(torch.float32)
     yhat = torch.sigmoid(model(inputs))
     yhat[yhat >= 0.5] = 1; yhat[yhat < 0.5] = 0
     
-    return yhat.detach().numpy()
+    return np.squeeze(yhat.detach().numpy())
 
 def obj(trial, fused):
     #Set hyperparamters to tune
@@ -513,3 +513,159 @@ class Objective(object):
         acc = obj(trial, self.fused)
         
         return acc
+    
+def train_best_model(fused, params):
+    #Load data
+    X = fused.drop(columns=['memory_gene'])
+    y = fused['memory_gene']*1
+    
+    #Get the N top features according to mutual information
+    selector = SelectKBest(mutual_info_classif, k=params['nb_features'])
+    X_redu = selector.fit_transform(X, y)
+    cols = selector.get_support(indices=True)
+    FS = X.iloc[:,cols].columns.tolist();FS.append('CV2ofmeans_residuals'); FS.append('memory_gene'); FS = np.unique(FS)
+
+    train_dl, test_dl = load_data(fused[FS],params)
+
+    model = NN_4lRBN(len(FS)-1, params)
+
+    #Optmization criterion and optimizer
+    num_positives= np.sum(y); num_negatives = len(y) - num_positives
+    pos_weight  = torch.as_tensor(num_negatives / num_positives, dtype=torch.float)
+    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    optimizer = SGD(model.parameters(), lr=params['learning_rate'], momentum=0.9, weight_decay=params['weight_decay'])
+
+    #Train and evaluate the NN
+    train_model(train_dl, model, criterion, optimizer)
+
+    return model
+
+def load_all_data():
+    general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
+
+    names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2',
+            'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 
+            'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 
+            'LK_LSK_D2_exp3_library_d2_5', 'LSK_D2_exp1_library_LSK_d2_1', 'LSK_D2_exp1_library_LSK_d2_2', 'LSK_D2_exp1_library_LSK_d2_3',
+           'LSK_D2_exp2_library_d2A_1', 'LSK_D2_exp2_library_d2A_2', 'LSK_D2_exp2_library_d2A_3' , 'LSK_D2_exp2_library_d2A_4', 'LSK_D2_exp2_library_d2A_5', 
+           'LSK_D2_exp2_library_d2B_1','LSK_D2_exp2_library_d2B_2', 'LSK_D2_exp2_library_d2B_3', 'LSK_D2_exp2_library_d2B_4', 'LSK_D2_exp2_library_d2B_5']
+    charac_matrix = []
+    norm_matrix = []
+    families_matrix = []
+    for name in names:
+        #Open characteristics file
+        charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + name + '__characteristics_output.txt'
+        p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + name + '.txt'
+        charac_matrix.append(open_charac(charac_out_path, p_value_path, 200))
+
+        #Open normalized data
+        norm_path = '../data/merged_data/' + name + '.csv'
+        fam_path = '../data/merged_data/y_' + name + '.csv'
+        norm = pd.read_csv (norm_path)
+        norm = norm.set_index('Unnamed: 0')
+        families= np.squeeze(np.array(pd.read_csv(fam_path)))
+
+        norm_matrix.append(norm)
+        families_matrix.append(families)
+
+    #Add general characteristic
+    for i in range(0,len(charac_matrix)):
+        charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
+        charac_matrix[i] = charac_matrix[i].drop(['skew_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
+        charac_matrix[i] = charac_matrix[i].dropna()
+
+    #Remove AE7, also keep BIDDYD15_2 and AE3 for validation
+    val = [0,8]
+    data_to_fuse = [1,3,4,5,6,7], data_to_fuse.append(np.arange(9,30,1)) 
+
+    outliers = []
+    for i in range(0,len(charac_matrix)):
+        #Normalize skew_residuals, same for mean_expression after removing outliers
+        charac_matrix[i], outlier_temp = remove_extreme_values(charac_matrix[i], k=200)
+        outliers.append(outlier_temp)
+        charac_matrix[i]['CV2ofmeans_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['CV2ofmeans_residuals']), normalize(charac_matrix[i]['mean_expression'])
+        charac_matrix[i]['length'], charac_matrix[i]['GC'] = normalize(charac_matrix[i]['length']), normalize(charac_matrix[i]['GC'])
+
+    val_charac =  []
+    names_val = []
+    for i in val:
+        val_charac.append(charac_matrix[i])
+        names_val.append(names[i])
+
+    fused_charac = []
+    names_fused = []
+    for i in data_to_fuse:
+        fused_charac.append(charac_matrix[i])
+        names_fused.append(names[i])
+
+    fused = pd.concat(fused_charac)
+    
+    return fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers
+
+def FS (X,y,params):
+    #Get the N top features according to mutual information
+    selector = SelectKBest(mutual_info_classif, k=params['nb_features'])
+    X_redu = selector.fit_transform(X, y)
+    cols = selector.get_support(indices=True)
+    FS = X.iloc[:,cols].columns.tolist();FS.append('CV2ofmeans_residuals'); FS = np.unique(FS)
+    
+    return FS
+
+def compute_enrichment(charac, y, yhat):
+    
+    non_memory_gene = list(charac_matrix[i][y == False].index)
+    memory_gene = list(charac_matrix[i][y == True].index)
+    yhat = pd.DataFrame(yhat, index = charac_matrix[i].index, columns = ['pred'])
+
+    y_non_mem = yhat.loc[non_memory_gene]
+    y_mem = yhat.loc[memory_gene]
+    recovery = np.sum(y_mem['pred'])/len(memory_gene)
+    false_pos = np.sum(y_non_mem['pred'])
+    
+    return recovery, false_pos
+
+def predict_evaluate_NN(genes:list, yhat:np.array, norm:pd.DataFrame, family:np.array, mult_pred:bool = False, outliers:list = []):
+    
+    y = pd.DataFrame(yhat, index = genes, columns = ['pred'])
+    
+    gene_subset = list(y[y['pred']==True].index)
+    if outliers:
+        gene_subset.extend(outliers)
+    
+    precision, recovery_clust, mult_precision, mult_recovery_clust = np.NaN, np.NaN, np.NaN, np.NaN
+    if gene_subset:
+        norm_subset = np.array(norm.loc[gene_subset].T)
+
+        model = FamiliesClusters(np.unique(family),compute_precision,True)
+        pred = model.fit_predict(norm_subset,family)
+        precision, recovery_clust = model.score_, model.recovery
+    
+    scores = [precision, recovery_clust]
+    if (mult_pred and gene_subset):
+        subset = np.ones((len(gene_subset),))
+        subsets = subsampling_genes(subset, 101, 0.25)
+        
+        model = EnsemblingHierarchical(np.unique(family),compute_precision,True,subsets = subsets, ensembling='voting', threshold_voting = 0.5)
+        result  = model.fit_predict(norm_subset, family)
+        mult_precision, mult_recovery_clust = model.score_, model.recovery
+        
+        scores.extend([mult_precision,mult_recovery_clust])
+    
+    return scores
+
+#Load data
+fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers = load_all_data()
+
+#Train model
+params = {  'learning_rate': 1e-4,
+            'weight_decay' : 1e-6,
+            'n1': 29,
+            'n2': 21,
+            'n3': 23,
+            'nb_features' : 15}
+
+model = train_best_model(fused, params)
+
+#Get the N top features according to mutual information
+X, y = fused.drop(columns=['memory_gene']), fused['memory_gene']
+FS = FS(X,y,params)
