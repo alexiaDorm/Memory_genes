@@ -613,9 +613,9 @@ def feature_selection(X,y,params):
 
 def compute_enrichment(charac, y, yhat):
     
-    non_memory_gene = list(charac_matrix[i][y == False].index)
-    memory_gene = list(charac_matrix[i][y == True].index)
-    yhat = pd.DataFrame(yhat, index = charac_matrix[i].index, columns = ['pred'])
+    non_memory_gene = list(charac[y == False].index)
+    memory_gene = list(charac[y == True].index)
+    yhat = pd.DataFrame(yhat, index = charac.index, columns = ['pred'])
 
     y_non_mem = yhat.loc[non_memory_gene]
     y_mem = yhat.loc[memory_gene]
