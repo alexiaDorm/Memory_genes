@@ -10,6 +10,23 @@ from load_data import open_charac, add_general_charac
 from binaryclass_memory import *
 
 
+#Load data
+fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers = load_all_data()
+
+#Train model
+params = {  'learning_rate': 1e-4,
+            'weight_decay' : 1e-6,
+            'n1': 29,
+            'n2': 21,
+            'n3': 23,
+            'nb_features' : 15}
+
+model = train_best_model(fused, params)
+
+#Get the N top features according to mutual information
+X, y = fused.drop(columns=['memory_gene']), fused['memory_gene']
+FS = FS(X,y,params)
+
 #Evaluate clustering
 scores = []
 for i in data_to_fuse:
