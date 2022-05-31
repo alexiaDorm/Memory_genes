@@ -576,7 +576,7 @@ def load_all_data():
 
     #Remove AE7, also keep BIDDYD15_2 and AE3 for validation
     val = [0,8]
-    data_to_fuse = [1,3,4,5,6,7], data_to_fuse.append(np.arange(9,30,1)) 
+    data_to_fuse = [1,3,4,5,6,7]; data_to_fuse.append(np.arange(9,30,1)) 
 
     outliers = []
     for i in range(0,len(charac_matrix)):
