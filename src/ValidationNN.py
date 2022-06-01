@@ -43,7 +43,7 @@ for i in data_to_fuse:
     recovery, false_pos = compute_enrichment(charac_matrix[i], y, yhat)
     score = [acc, recovery, false_pos]
     
-    score.extend(predict_evaluate_NN(charac_matrix[i].index, yhat, norm_matrix[i], families_matrix[i], mult_pred=True, outliers = outliers[i]))
+    score.extend(predict_evaluate(charac_matrix[i].index, yhat, norm_matrix[i], families_matrix[i], mult_pred=True, outliers = outliers[i]))
     scores.append(score)
 
 #Evaluate clustering on validation set 

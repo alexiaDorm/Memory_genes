@@ -19,6 +19,8 @@ Y = np.array(fused['memory_gene'])
 
 model = SVC(C=params['C'], kernel = 'rbf', gamma = params['gamma'], class_weight = 'balanced').fit(X,Y)
 
+FS
+
 #Evaluate clustering
 scores = []
 for i in data_to_fuse:

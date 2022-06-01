@@ -69,40 +69,6 @@ def visualize_charac(data:pd.DataFrame):
     plt.title("Only memory genes")
     plt.show()'''
     
-
-def predict_evaluate(data_charac:pd.DataFrame, norm:pd.DataFrame, family:np.array, clf, mult_pred:bool = False, outliers:list = []):
-    #Evaluate extracted subset on RNAseq Data
-    X = np.array(data_charac.drop(columns=['memory_gene']))
-    Y = np.array(data_charac['memory_gene'])
-    
-    #Get gene set
-    y = clf.predict(X)
-    y = pd.DataFrame(y, index = data_charac.index, columns = ['pred'])
-    gene_subset = list(y[y['pred']==True].index)
-    if outliers:
-        gene_subset.extend(outliers)
-    
-    precision, recovery_clust, mult_precision, mult_recovery_clust = np.NaN, np.NaN, np.NaN, np.NaN
-    if gene_subset:
-        norm_subset = np.array(norm.loc[gene_subset].T)
-
-        model = FamiliesClusters(np.unique(family),compute_precision,True)
-        pred = model.fit_predict(norm_subset,family)
-        precision, recovery_clust = model.score_, model.recovery
-    
-    scores = [precision, recovery_clust]
-    if (mult_pred and gene_subset):
-        subset = np.ones((len(gene_subset),))
-        subsets = subsampling_genes(subset, 101, 0.25)
-        
-        model = EnsemblingHierarchical(np.unique(family),compute_precision,True,subsets = subsets, ensembling='voting', threshold_voting = 0.5)
-        result  = model.fit_predict(norm_subset, family)
-        mult_precision, mult_recovery_clust = model.score_, model.recovery
-        
-        scores.extend([mult_precision,mult_recovery_clust])
-    
-    return scores
-
 #--------------------------------------------------------------------------------
 #A few functions for Neural network training
 class Dataset(torch.utils.data.Dataset):
@@ -539,7 +505,7 @@ def compute_enrichment(charac, y, yhat):
     
     return recovery, false_pos
 
-def predict_evaluate_NN(genes:list, yhat:np.array, norm:pd.DataFrame, family:np.array, mult_pred:bool = False, outliers:list = []):
+def predict_evaluate(genes:list, yhat:np.array, norm:pd.DataFrame, family:np.array, mult_pred:bool = False, outliers:list = []):
     
     y = pd.DataFrame(yhat, index = genes, columns = ['pred'])
     
