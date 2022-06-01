@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NNpos5"
-#SBATCH --error="NNpos5.err"
-#SBATCH --output="NNpos5.out"
+#SBATCH --job-name="LogReg"
+#SBATCH --error="LogReg.err"
+#SBATCH --output="LogReg.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python NNopt.py 
+srun python LogReg.py 
  
 echo FINISHED at `date`
 
