@@ -495,7 +495,7 @@ def obj(trial, fused):
     #Optmization loss and optimizer
     #num_positives= np.sum(y); num_negatives = len(y) - num_positives
     #pos_weight  = torch.as_tensor(num_negatives / num_positives, dtype=torch.float)
-    pos_weight = torch.as_tensor(4., dtype=torch.float)
+    pos_weight = torch.as_tensor(5., dtype=torch.float)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     
     optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'], weight_decay=params['weight_decay'])
