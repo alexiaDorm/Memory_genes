@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="LogReg"
-#SBATCH --error="LogReg.err"
-#SBATCH --output="LogReg.out"
+#SBATCH --job-name="LogRegskew"
+#SBATCH --error="LogRegskew.err"
+#SBATCH --output="LogRegskew.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1

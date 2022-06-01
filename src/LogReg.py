@@ -18,7 +18,7 @@ random.seed(1)
 
 fused = load_charac()
     
-X = fused[['CV2ofmeans_residuals','mean_expression']]
+X = fused[['skew_residuals','mean_expression']]
 y = fused['memory_gene']     
 
 #Grid search around best found parameters during random grid search
