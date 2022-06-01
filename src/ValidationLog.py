@@ -18,7 +18,7 @@ lamb = 1000
 X = np.array(fused[['CV2ofmeans_residuals','mean_expression']])
 Y = np.array(fused['memory_gene'])
 
-model = LogisticRegression(C = lamb, class_weight = 'balanced', max_iter=10000).fit(X,Y)
+clf = LogisticRegression(C = lamb, class_weight = 'balanced', max_iter=10000).fit(X,Y)
 
 FS = ['CV2ofmeans_residuals','mean_expression']
 
