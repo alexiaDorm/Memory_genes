@@ -18,8 +18,12 @@ np.random.seed(1)
 random.seed(1)
 
 fused = load_charac()
+
+#Get the N top features according to mutual information
+params = {'nb_features' : 9}
+FS = feature_selection(X,y,params)
     
-X = fused[['CV2ofmeans_residuals','mean_expression']]
+X = fused[FS]
 y = fused['memory_gene']     
 
 #Grid search around best found parameters during random grid search
