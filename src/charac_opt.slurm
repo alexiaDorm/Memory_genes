@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NNpos3"
-#SBATCH --error="NNpos3.err"
-#SBATCH --output="NNpos3.out"
+#SBATCH --job-name="NNpos4"
+#SBATCH --error="NNpos4.err"
+#SBATCH --output="NNpos4.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
