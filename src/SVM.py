@@ -21,6 +21,7 @@ fused = load_charac()
 
 #Get the N top features according to mutual information
 params = {'nb_features' : 18}
+X, y = fused.drop(columns=['memory_gene']), fused['memory_gene']
 FS = feature_selection(X,y,params)
     
 X = fused[FS]
