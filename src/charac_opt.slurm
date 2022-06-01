@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="SVM_H"
-#SBATCH --error="SVM_H.err"
-#SBATCH --output="SVM_H.out"
+#SBATCH --job-name="SVM_M"
+#SBATCH --error="SVM_M.err"
+#SBATCH --output="SVM_M.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
