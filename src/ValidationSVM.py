@@ -8,63 +8,16 @@ import pyreadr
 from load_data import open_charac, add_general_charac
 from binaryclass_memory import *
 
-general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
+#Load data
+fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers = load_all_data()
 
-names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2']
-charac_matrix = []
-norm_matrix = []
-families_matrix = []
-for name in names:
-    #Open characteristics file
-    charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + name + '__characteristics_output.txt'
-    p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + name + '.txt'
-    charac_matrix.append(open_charac(charac_out_path, p_value_path, 200))
-    
-    #Open normalized data
-    norm_path = '../data/merged_data/' + name + '.csv'
-    fam_path = '../data/merged_data/y_' + name + '.csv'
-    norm = pd.read_csv (norm_path)
-    norm = norm.set_index('Unnamed: 0')
-    families= np.squeeze(np.array(pd.read_csv(fam_path)))
-    
-    norm_matrix.append(norm)
-    families_matrix.append(families)
-    
-#Add general characteristic
-for i in range(0,len(charac_matrix)):
-    charac_matrix[i] = charac_matrix[i].drop(['CV2ofmeans_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans'], axis=1)
-    charac_matrix[i] = charac_matrix[i].dropna()
-    
-#Remove AE7, also keep BIDDYD15_2 for validation
-val = [8]
-data_to_fuse = [0,1,3,4,5,6,7] 
+#Train model
+params = {  'C': X, 'gamma' : X}
 
-outliers = []
-for data in charac_matrix:
-    #Normalize skew_residuals, same for mean_expression after removing outliers
-    charac_matrix[i], outlier_temp = remove_extreme_values(charac_matrix[i], k=200)
-    outliers.append(outlier_temp)
-    charac_matrix[i]['skew_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['skew_residuals']), normalize(charac_matrix[i]['mean_expression'])
-
-val_charac =  []
-for i in val:
-    val_charac.append(charac_matrix[i])
-
-fused_charac = []
-names_fused = []
-for i in data_to_fuse:
-    fused_charac.append(charac_matrix[i])
-    names_fused.append(names[i])
-    
-fused = pd.concat(fused_charac)
-
-#Best parameters
-lamb = 0.0001
-
-X = np.array(fused.drop(columns=['memory_gene']))
+X = np.array(fused[['CV2ofmeans_residuals','mean_expression']])
 Y = np.array(fused['memory_gene'])
 
-clf = SVC(C=lamb, kernel = 'rbf', class_weight = 'balanced').fit(X,Y)
+model = SVC(C=params['C'], kernel = 'rbf', gamma = params['gamma'], class_weight = 'balanced').fit(X,Y)
 
 #Evaluate clustering
 scores = []

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import sklearn
 import pyreadr
 from sklearn.svm import SVC
+from sklearn.model_selection import KFold, GridSearchCV
 
 from load_data import open_charac
 from binaryclass_memory import *
