@@ -362,7 +362,7 @@ def obj(trial, fused):
     y = fused['memory_gene']*1
     
     #Get the N top features according to mutual information
-    selector = SelectKBest(mutual_info_classif, k=2)
+    selector = SelectKBest(mutual_info_classif, k=params['nb_features'])
     X_redu = selector.fit_transform(X, y)
     cols = selector.get_support(indices=True)
     FS = X.iloc[:,cols].columns.tolist();FS.append('CV2ofmeans_residuals'); FS.append('memory_gene'); FS = np.unique(FS)
