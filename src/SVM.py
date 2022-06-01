@@ -20,7 +20,7 @@ random.seed(1)
 fused = load_charac()
 
 #Get the N top features according to mutual information
-params = {'nb_features' : 9}
+params = {'nb_features' : 18}
 FS = feature_selection(X,y,params)
     
 X = fused[FS]
