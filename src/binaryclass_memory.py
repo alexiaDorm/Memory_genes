@@ -412,7 +412,7 @@ def train_best_model(fused, params):
 
     #Optmization criterion and optimizer
     num_positives= np.sum(y); num_negatives = len(y) - num_positives
-    pos_weight  = torch.as_tensor(num_negatives / num_positives, dtype=torch.float)
+    pos_weight  = torch.as_tensor(3., dtype=torch.float)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     optimizer = SGD(model.parameters(), lr=params['learning_rate'], momentum=0.9, weight_decay=params['weight_decay'])
 
