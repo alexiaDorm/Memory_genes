@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="ValNNpos5"
-#SBATCH --error="ValNNpos5.err"
-#SBATCH --output="ValNNpos5.out"
+#SBATCH --job-name="ValNNpos4"
+#SBATCH --error="ValNNpos4.err"
+#SBATCH --output="ValNNpos4.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
