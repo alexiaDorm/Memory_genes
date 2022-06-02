@@ -14,12 +14,12 @@ from binaryclass_memory import *
 fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers = load_all_data()
 
 #Train model
-params = {  'learning_rate': 1e-4,
-            'weight_decay' : 1e-6,
-            'n1': 29,
-            'n2': 21,
-            'n3': 23,
-            'nb_features' : 15}
+params = {  'learning_rate': 7.45e-5,
+            'weight_decay' : 7.88e-8,
+            'n1': 45,
+            'n2': 22,
+            'n3': 11,
+            'nb_features' : 7}
 
 model = train_best_model(fused, params)
 
@@ -65,4 +65,4 @@ for i in val:
     scores.append(score)
     
 scores_df = pd.DataFrame(scores, index = names_fused + names_val, columns= ['accuracy', 'recovery memory gene', 'FP', 'precision', 'recovery', 'ensembling precision', 'ensembling recovery'])
-scores_df.to_csv('../data/binaryClass_scores/bestNN.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/bestNNpos3.csv', index=True)
