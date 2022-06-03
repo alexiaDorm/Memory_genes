@@ -12,7 +12,7 @@ from binaryclass_memory import *
 fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers = load_all_data()
 
 #Train model
-params = {  'C': X, 'gamma' : X}
+params = {  'C': 100000, 'gamma' : 'scale'}
 
 X = np.array(fused[['CV2ofmeans_residuals','mean_expression']])
 Y = np.array(fused['memory_gene'])

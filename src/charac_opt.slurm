@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="NNfinal"
-#SBATCH --error="NNfinal.err"
-#SBATCH --output="NNfinal.out"
+#SBATCH --job-name="ValSVM"
+#SBATCH --error="ValSVM.err"
+#SBATCH --output="ValSVM.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python NNopt.py 
+srun python ValidationSVM.py 
  
 echo FINISHED at `date`
 
