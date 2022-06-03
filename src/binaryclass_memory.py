@@ -348,14 +348,14 @@ def predict(inputs, model):
 def obj(trial, fused):
     #Set hyperparamters to tune
     params = {
-              'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1),
-              'weight_decay' : trial.suggest_loguniform('weight_decay', 1e-8, 1e-2),
-              'n1': trial.suggest_int("n1", 4, 50),
-              'n2' : trial.suggest_int("n2", 4, 50), 
-              'n3' : trial.suggest_int("n3", 4, 50),
+              'learning_rate': trial.suggest_loguniform('learning_rate', 1e-6, 0.001),
+              'weight_decay' : trial.suggest_loguniform('weight_decay', 1e-10, 1e-5),
+              'n1': trial.suggest_int("n1", 20, 50),
+              'n2' : trial.suggest_int("n2", 20, 50), 
+              'n3' : trial.suggest_int("n3", 15, 40),
               #'n4': trial.suggest_int("n4", 4, 50),
               #'batch_size': trial.suggest_int("batch_size", 5, 8), #2^i
-              'nb_features' : trial.suggest_int("nb_features", 2, 18),
+              'nb_features' : trial.suggest_int("nb_features", 6, 13),
               }
     #Load data
     X = fused.drop(columns=['memory_gene'])
@@ -374,7 +374,7 @@ def obj(trial, fused):
     #Optmization loss and optimizer
     #num_positives= np.sum(y); num_negatives = len(y) - num_positives
     #pos_weight  = torch.as_tensor(num_negatives / num_positives, dtype=torch.float)
-    pos_weight = torch.as_tensor(5., dtype=torch.float)
+    pos_weight = torch.as_tensor(4., dtype=torch.float)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     
     optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'], weight_decay=params['weight_decay'])
@@ -456,8 +456,8 @@ def load_all_data():
         charac_matrix[i] = charac_matrix[i].dropna()
 
     #Remove AE7, also keep BIDDYD15_2 and AE3 for validation
-    val = [0,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]
-    data_to_fuse = [1,3,4,5,6,7]
+    val = [8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]
+    data_to_fuse = [0,1,3,4,5,6,7]
 
     outliers = []
     for i in range(0,len(charac_matrix)):

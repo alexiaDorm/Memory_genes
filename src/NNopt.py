@@ -15,7 +15,7 @@ fused = load_charac()
 objective = Objective(fused)
 
 study = optuna.create_study(direction='maximize')
-study.optimize(objective, n_trials=100)
+study.optimize(objective, n_trials=200)
 
 best_trial = study.best_trial
 
