@@ -6,7 +6,6 @@ from typing import AnyStr, Callable
 
 from pred_score import *
 from Filter_FS import *
-from Wrapper_FS import *
 
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Few functions for cross-validation

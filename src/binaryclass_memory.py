@@ -35,15 +35,15 @@ def visualize_charac(data:pd.DataFrame):
     print(mem_genes_perc_outliers, '% of the outliers are memory genes')
     
     #Shift the skeness values by substracting them with their mean
-    corrected_skewRes = normalize(data['CV2ofmeans_residuals'])
+    corrected_skewRes = data['CV2ofmeans_residuals']
     #corrected_skewRes -= np.mean(corrected_skewRes)
     
     #Look at skenness and mean expression of all genes
     colors = ['grey','red']
-    plt.scatter(corrected_skewRes, normalize(data['mean_expression']), marker='o', c= data['memory_gene'], cmap=matplotlib.colors.ListedColormap(colors))
-    plt.xlabel("skew")
+    plt.scatter(corrected_skewRes, data['mean_expression'], marker='o', c= data['memory_gene'], cmap=matplotlib.colors.ListedColormap(colors))
+    plt.xlabel("CV2 of mean residuals")
     plt.ylabel("mean expression")
-    plt.xlim(-40,60)
+    #plt.xlim(0,1)
     plt.yscale('log')
     plt.title("All genes")
     plt.show()

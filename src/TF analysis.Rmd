@@ -1,0 +1,147 @@
+---
+title: "TF analysis"
+---
+```{r}
+library(Signac)
+library(Seurat)
+library(tibble)
+library(Matrix)
+
+set.seed(1990)
+```
+
+```{r}
+counts <- GetAssayData(atac_small, slot = "counts")
+chromatinassay <- CreateChromatinAssay(counts = counts, genome = "mm10")
+```
+
+
+```{r}
+peakCounts <- read.csv('../data/chrom_position.csv')
+genes <- peakCounts$X
+peakCounts$X <- NULL
+
+cols <- c( 'chr', 'start' , 'end' )
+peakCounts$pos <- do.call(paste, c(peakCounts[cols], sep="-"))
+for (co in cols) peakCounts[co] <- NULL
+
+peakCounts$mock_cell <- rep(1,times=length(peakCounts$pos))
+peakCounts <- peakCounts %>%column_to_rownames('pos')
+
+head(peakCounts)
+
+```
+```{r}
+chrom_assay <- CreateChromatinAssay(data = peakCounts)
+```
+
+Create Grange of the position of all the genes
+```{r}
+library(GenomicRanges)
+
+peakCounts <- read.csv('../data/chrom_position.csv')
+peakCounts <- peakCounts %>%
+         column_to_rownames('X')
+
+gr <- GRanges(
+    seqnames = peakCounts$chr,
+    ranges = IRanges(start = peakCounts$start, end = peakCounts$end))
+
+names(gr) <- peakCounts$X
+
+peakCounts
+
+```
+Load HOCOMOCO for TF motif analysis
+```{r}
+outFolder <- '../data/'
+# prepare motifs HOCOMOCO
+file_motifs_rds = paste0(outFolder,"HOCO11MOUSE.pfmlist.rds")
+
+if (file.exists(file_motifs_rds)) {
+  motifsProcessed <- readRDS(file_motifs_rds)
+} else {
+  
+  file_url =  "https://hocomoco11.autosome.ru/final_bundle/hocomoco11/full/MOUSE/mono/HOCOMOCOv11_full_pwm_MOUSE_mono.tar.gz"
+  file_downloadLocation =  paste0(outFolder, "HOCOMOCOv11_full_pwm_MOUSE_mono.tar.gz")
+  
+  download.file(file_url, destfile= file_downloadLocation)
+  
+  # First, just check contents without extracting
+  head(untar(file_downloadLocation,list = TRUE))
+  
+  # Time to extract the files
+  untar(file_downloadLocation, exdir = outFolder, verbose = TRUE)
+ 
+  # for file in pwm/*pwm; do echo "" >> "$file"; done
+  pathToPWMs = paste0(outFolder, "/pwm/")
+  
+  # We can now automatically save all file names into a vector and process it in R directly
+  pwmfiles = list.files(pathToPWMs, full.names = TRUE)
+
+  motif.list <- vector("list", length(pwmfiles))
+
+  i = 1 # Counter
+  for (fileCurrent in pwmfiles) {
+    
+    # We now read in the PWM file and create a universalmotif object out of it
+    # We here suppress warnings that are not relevant for us for improved output
+    motivCur = suppressWarnings(universalmotif::read_matrix(fileCurrent, headers = ">", sep = "", positions = "rows"))
+    
+    # We now have to convert the current class universalmotif to class "TFBSTools-PFMatrix
+  # We here suppress notes that are not relevant for us for improved output
+    motivConverted = suppressMessages(convert_motifs(motivCur, class = "TFBSTools-PFMatrix"))
+    
+    # Save it in our list
+    motif.list[[i]] = motivConverted
+    
+    # Increase our list counter
+    i = i +1
+  }
+  
+  # We now have a populated list of all motif objects and are almost done.
+  
+  # We now set proper names for the list, which we simply take from the parsed files
+  names(motif.list) = str_remove(basename(pwmfiles),".pwm")
+  
+  # Finally, we can convert it to a PFMatrixList object
+  motifsProcessed <- do.call(PFMatrixList, motif.list)
+  
+  saveRDS(motifsProcessed, file = file_motifs_rds)
+}
+```
+
+Scan the DNA sequence of each peak for the presence of each motif and create a motif x feature matrix from a set of genomic ranges.
+```{r}
+# Define a new file name that we try to load into R directly if it exists. If not, we create it
+ motif.matrix_name = paste0(outFolder,"motifmatrix.mouse.rds")
+ 
+ if (file.exists(motif.matrix_name)) {
+     
+   motif.matrix = readRDS(file  = motif.matrix_name)
+   
+ } else {
+   
+    motif.matrix <- CreateMotifMatrix(
+      features = gr,
+      pwm = motifsProcessed, genome = 'mm39',
+      use.counts = FALSE
+    )
+    colnames(motif.matrix) = TFBSTools::name(motifsProcessed)
+    
+    # Save it.
+    saveRDS(motif.matrix, file  = motif.matrix_name)
+
+ }
+
+#motifsFinal <- CreateMotifObject(data = motif.matrix, pwm = motifsProcessed)
+
+```
+
+```{r}
+
+motif <- as.matrix(motif.matrix)
+dim(motif)
+
+```
+
