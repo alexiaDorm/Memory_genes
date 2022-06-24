@@ -52,7 +52,7 @@ print(model.score_, model.recovery)
 #ANOVA
 print('ANOVA')
 N = np.arange(1000,1500,1)
-best_subset, best_score = ANOVA(y, norm, FamiliesClusters, compute_recovery,True, N, plot=True)
+best_subset, best_score = ANOVA(y, norm, FamiliesClusters, compute_precision,True, N, plot=True)
 print(len(best_subset), best_score)
 
 #Predict and evaluate on whole data  set
