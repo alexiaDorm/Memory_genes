@@ -32,7 +32,7 @@ norm = np.array(norm)
 
 #MIM
 print('MIM')
-N = np.arange(100,4000,25)
+N = np.arange(100,4000,1)
 best_subset, best_score = MIM(y, norm, FamiliesClusters, compute_precision,True, N, 3, plot=True) 
 print(len(best_subset), best_score)
 
@@ -49,7 +49,7 @@ model = EnsemblingHierarchical(np.unique(y),compute_precision,True,subsets = sub
 result  = model.fit_predict(X = x_subset, y= y)
 print(model.score_, model.recovery)
 
-#ANOVA
+'''#ANOVA
 print('ANOVA')
 N = np.arange(1000,1500,1)
 best_subset, best_score = ANOVA(y, norm, FamiliesClusters, compute_precision,True, N, plot=True)
@@ -66,6 +66,6 @@ subsets = subsampling_genes(subset, 101, 0.25)
 
 model = EnsemblingHierarchical(np.unique(y),compute_precision,True,subsets = subsets, ensembling='voting', threshold_voting = 0.5)
 result  = model.fit_predict(X = x_subset, y= y)
-print(model.score_, model.recovery)
+print(model.score_, model.recovery)'''
 
 get_best_genes_names(best_subset, '../data/processed_data/CD8genes_interest.csv', '../data/optimized_subsets/CD8genes_best.csv')
