@@ -27,6 +27,8 @@ print(norm.shape)
 #Save gene interest
 pd.DataFrame(norm.T.index).to_csv('../data/processed_data/L1210genes_interest.csv', index = False)
 
+norm = np.array(norm)
+
 #MIM
 print('MIM')
 N = np.arange(100,4000,25)
