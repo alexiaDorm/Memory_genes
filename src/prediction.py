@@ -15,6 +15,7 @@ names = ['AE3', 'D0_exp1', 'D0_exp2', 'D6_exp1', 'D6_exp2', 'D15_exp1', 'D15_exp
 scores = []; names_scores = ['ML precision', 'ML recovery', 'CV2 precision', 'CV2 recovery']
 for name in names:
     
+    print(name)
     #Load preprocess data
     norm = pd.read_csv ('../data/merged_data/' + name + '.csv')
     norm = norm.set_index('Unnamed: 0')
