@@ -10,7 +10,7 @@ random.seed(3)
 np.random.seed(3)
 
 #Define name of all dataset to analyze
-names = ['AE3', 'D0_exp1', 'D0_exp2', 'D6_exp1', 'D6_exp2', 'D15_exp1', 'D15_exp2', 'CD8', 'L1210', 'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 'LK_LSK_D2_exp3_library_d2_5', 'LSK_D2_exp1_library_LSK_d2_1', 'LSK_D2_exp1_library_LSK_d2_2', 'LSK_D2_exp1_library_LSK_d2_3', 'LSK_D2_exp2_library_d2A_1', 'LSK_D2_exp2_library_d2A_2', 'LSK_D2_exp2_library_d2A_3' , 'LSK_D2_exp2_library_d2A_4', 'LSK_D2_exp2_library_d2A_5', 'LSK_D2_exp2_library_d2B_1','LSK_D2_exp2_library_d2B_2', 'LSK_D2_exp2_library_d2B_3', 'LSK_D2_exp2_library_d2B_4', 'LSK_D2_exp2_library_d2B_5', 'LSKmix_exp1_d2_1', 'LSKmix_exp1_d2_2', 'LSKmix_exp1_d2_3', 'LSKmix_exp2_d2_6', 'LSKmix_exp2_d2B_4', 'LSKmix_exp2_d2B_5']
+names = ['AE3', 'D0_exp1', 'D0_exp2', 'D6_exp1', 'D6_exp2', 'D15_exp1', 'D15_exp2', 'CD8', 'L1210', 'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 'LK_LSK_D2_exp3_library_d2_5', 'LSK_D2_exp1_library_LSK_d2_1', 'LSK_D2_exp1_library_LSK_d2_2', 'LSK_D2_exp1_library_LSK_d2_3', 'LSK_D2_exp2_library_d2A_1', 'LSK_D2_exp2_library_d2A_2', 'LSK_D2_exp2_library_d2A_3' , 'LSK_D2_exp2_library_d2A_4', 'LSK_D2_exp2_library_d2A_5', 'LSK_D2_exp2_library_d2B_1','LSK_D2_exp2_library_d2B_2', 'LSK_D2_exp2_library_d2B_3', 'LSK_D2_exp2_library_d2B_4', 'LSK_D2_exp2_library_d2B_5', 'LK_LSK_D2_exp3_library_d2_1', 'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 'LK_LSK_D2_exp3_library_d2_5']
 
 scores = []; names_scores = ['ML precision', 'ML recovery', 'CV2 precision', 'CV2 recovery']
 for name in names:
@@ -38,7 +38,9 @@ for name in names:
     model_CV2 = EnsemblingHierarchical(np.unique(y),compute_precision,True, subsets_CV2 = subsets, ensembling='voting', threshold_voting = 0.5)
     result_CV2 = model_CV2.fit_predict(X = norm_CV2, y= y)
     
-    score = [model_ML.score_, compute_sensitivity(y, result_ML), model_CV2.score_, compute_sensitivity(y, result_CV2)]; scores.append(score)
+    #Compute scores
+    score = [model_ML.score_, compute_sensitivity(y, result_ML), model_CV2.score_, compute_sensitivity(y, result_CV2)] 
+    scores.append(score)
     
 scores = pd.DataFrame(scores, columns = names_scores, index = names)
 scores.to_csv('prediction_values', index = True)
