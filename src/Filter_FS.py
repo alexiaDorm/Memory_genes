@@ -54,7 +54,6 @@ def MIM(y:np.array,x:np.array, Model: Callable, Scoring: Callable, maximize:bool
         
         #Evaluate the error on given subset
         x_subset = x[:, subset]
-        print(x_subset.shape)
         score = evaluate(y,x_subset,Model,Scoring,maximize)
         if ((best_score == None) or (maximize==True and score > best_score) or (maximize ==False and score < best_score)):
             #Convert best_subset into features indices
