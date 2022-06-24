@@ -32,10 +32,10 @@ for name in names:
     subsets_CV2 = subsampling_genes(subset, 100, 0.25)
     
     #Predict family using ML and CV2 sets
-    model_ML = EnsemblingHierarchical(np.unique(y),compute_precision,True, subsets_ML = subsets, ensembling='voting', threshold_voting = 0.5)
+    model_ML = EnsemblingHierarchical(np.unique(y),compute_precision,True, subsets = subsets_ML, ensembling='voting', threshold_voting = 0.5)
     result_ML = model_ML.fit_predict(X = norm_ML, y= y)
     
-    model_CV2 = EnsemblingHierarchical(np.unique(y),compute_precision,True, subsets_CV2 = subsets, ensembling='voting', threshold_voting = 0.5)
+    model_CV2 = EnsemblingHierarchical(np.unique(y),compute_precision,True, subsets = subsets_CV2, ensembling='voting', threshold_voting = 0.5)
     result_CV2 = model_CV2.fit_predict(X = norm_CV2, y= y)
     
     #Compute scores
