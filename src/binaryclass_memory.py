@@ -353,7 +353,7 @@ def obj(trial, fused):
     #Load data
     train_dl, test_dl = load_data(fused,params)
 
-    model = NN_1l(len(FS)-1, params)
+    model = NN_1l(2, params)
 
     #Optmization loss and optimizer
     pos_weight = torch.as_tensor(4., dtype=torch.float)
