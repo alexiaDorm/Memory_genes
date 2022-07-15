@@ -348,7 +348,7 @@ def obj(trial, fused):
               'weight_decay' : trial.suggest_loguniform('weight_decay', 1e-10, 1e-5),
               #'n1': trial.suggest_int("n1", 20, 50),
               #'n2' : trial.suggest_int("n2", 20, 50), 
-              3'n3' : trial.suggest_int("n3", 15, 40),
+              #'n3' : trial.suggest_int("n3", 15, 40),
               }
     #Load data
     train_dl, test_dl = load_data(fused,params)
