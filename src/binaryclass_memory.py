@@ -359,7 +359,7 @@ def obj(trial, fused):
     pos_weight = torch.as_tensor(4., dtype=torch.float)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'], momentum=0.9, weight_decay=params['weight_decay'])
+    optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'], weight_decay=params['weight_decay'])
 
     #Train and evaluate the NN
     train_model(train_dl, model, criterion, optimizer)
