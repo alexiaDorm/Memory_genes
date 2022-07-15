@@ -7,7 +7,6 @@ import pyreadr
 import math 
 from typing import AnyStr, Callable
 from collections import Counter
-from imblearn.over_sampling import RandomOverSampler
 from load_data import open_charac, add_general_charac, normalize, remove_extreme_values
 from pred_score import *
 from sklearn.linear_model import LogisticRegression
@@ -105,8 +104,6 @@ def load_data (fused:pd.DataFrame, params):
 
 def load_charac():
     #Load data
-    general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
-
     names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2']
 
     charac_matrix = []
@@ -116,23 +113,22 @@ def load_charac():
         p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + name + '.txt'
         charac_matrix.append(open_charac(charac_out_path, p_value_path, 200))
 
-    #Add general characteristic
+    #Only keep mean_exp + Cv2 residual
     for i in range(0,len(charac_matrix)):
-        charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
-        charac_matrix[i] = charac_matrix[i].drop(['skew_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
+        charac_matrix[i] = charac_matrix[i][['mean_expression','CV2ofmeans_residuals', 'memory_gene']]
         charac_matrix[i] = charac_matrix[i].dropna()
 
-    #Remove AE7, also keep BIDDYD15_2 for validation
+    #Remove AE7, also keep BIDDY D15_2 for validation
     val = [8]
     data_to_fuse = [0,1,3,4,5,6,7]
 
     outliers = []
     for i in range(0,len(charac_matrix)):
-        #Normalize skew_residuals, same for mean_expression after removing outliers
+        #Normalize mean expression, same for mean_expression after removing outliers
         charac_matrix[i], outlier_temp = remove_extreme_values(charac_matrix[i], k=200)
         outliers.append(outlier_temp)
-        charac_matrix[i]['CV2ofmeans_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['CV2ofmeans_residuals']), normalize(charac_matrix[i]['mean_expression'])
-        charac_matrix[i]['length'], charac_matrix[i]['GC'] = normalize(charac_matrix[i]['length']), normalize(charac_matrix[i]['GC'])
+        charac_matrix[i]['CV2ofmeans_residuals'] = normalize(charac_matrix[i]['CV2ofmeans_residuals'])
+        charac_matrix[i]['mean_expression'] =  normalize(charac_matrix[i]['mean_expression'])
 
     val_charac =  []
     for i in val:
@@ -350,34 +346,20 @@ def obj(trial, fused):
     params = {
               'learning_rate': trial.suggest_loguniform('learning_rate', 1e-6, 0.001),
               'weight_decay' : trial.suggest_loguniform('weight_decay', 1e-10, 1e-5),
-              'n1': trial.suggest_int("n1", 20, 50),
-              'n2' : trial.suggest_int("n2", 20, 50), 
-              'n3' : trial.suggest_int("n3", 15, 40),
-              #'n4': trial.suggest_int("n4", 4, 50),
-              #'batch_size': trial.suggest_int("batch_size", 5, 8), #2^i
-              'nb_features' : trial.suggest_int("nb_features", 6, 13),
+              #'n1': trial.suggest_int("n1", 20, 50),
+              #'n2' : trial.suggest_int("n2", 20, 50), 
+              3'n3' : trial.suggest_int("n3", 15, 40),
               }
     #Load data
-    X = fused.drop(columns=['memory_gene'])
-    y = fused['memory_gene']*1
-    
-    #Get the N top features according to mutual information
-    selector = SelectKBest(mutual_info_classif, k=params['nb_features'])
-    X_redu = selector.fit_transform(X, y)
-    cols = selector.get_support(indices=True)
-    FS = X.iloc[:,cols].columns.tolist();FS.append('CV2ofmeans_residuals'); FS.append('memory_gene'); FS = np.unique(FS)
+    train_dl, test_dl = load_data(fused,params)
 
-    train_dl, test_dl = load_data(fused[FS],params)
-
-    model = NN_4lRBN(len(FS)-1, params)
+    model = NN_1l(len(FS)-1, params)
 
     #Optmization loss and optimizer
-    #num_positives= np.sum(y); num_negatives = len(y) - num_positives
-    #pos_weight  = torch.as_tensor(num_negatives / num_positives, dtype=torch.float)
     pos_weight = torch.as_tensor(4., dtype=torch.float)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'], weight_decay=params['weight_decay'])
+    optimizer = torch.optim.Adam(model.parameters(), lr=params['learning_rate'], momentum=0.9, weight_decay=params['weight_decay'])
 
     #Train and evaluate the NN
     train_model(train_dl, model, criterion, optimizer)
