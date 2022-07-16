@@ -1,8 +1,4 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import sklearn
-import numpy as np
 import matplotlib.pyplot as plt
 
 import io 
@@ -19,6 +15,7 @@ from overlap_genes import *
 random.seed(3)
 np.random.seed(3)
 
+#L1210
 norm = pd.read_csv ('../data/merged_data/L1210.csv')
 norm = norm.set_index('Unnamed: 0').T
 y = np.squeeze(np.array(pd.read_csv ('../data/merged_data/y_L1210.csv')))
@@ -27,11 +24,15 @@ print(norm.shape)
 #Save gene interest
 pd.DataFrame(norm.T.index).to_csv('../data/processed_data/L1210genes_interest.csv', index = False)
 
-norm = np.array(norm)
+print('L1210')
+print('MIM')
+N = np.arange(100,4000,25)
+best_subset, best_score = MIM(y, norm, FamiliesClusters, compute_precision,True, N, 3, plot=True) 
+print(len(best_subset), best_score)
 
 #MIM
 print('MIM')
-N = np.arange(100,4000,25)
+N = np.arange(100,4000,1)
 best_subset, best_score = MIM(y, norm, FamiliesClusters, compute_precision,True, N, 3, plot=True) 
 print(len(best_subset), best_score)
 
@@ -48,10 +49,9 @@ model = EnsemblingHierarchical(np.unique(y),compute_precision,True,subsets = sub
 result  = model.fit_predict(X = x_subset, y= y)
 print(model.score_, model.recovery)
 
-#ANOVA
 print('ANOVA')
 N = np.arange(1000,1500,1)
-best_subset, best_score = ANOVA(y, norm, FamiliesClusters, compute_precision,True, N, plot=True)
+best_subset, best_score = ANOVA(y, norm, FamiliesClusters, compute_recovery,True, N, plot=True)
 print(len(best_subset), best_score)
 
 #Predict and evaluate on whole data  set

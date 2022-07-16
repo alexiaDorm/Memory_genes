@@ -1,8 +1,4 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import sklearn
-import numpy as np
 import matplotlib.pyplot as plt
 
 import io 
@@ -28,7 +24,11 @@ print(norm.shape)
 #Save gene interest
 pd.DataFrame(norm.T.index).to_csv('../data/processed_data/CD8genes_interest.csv', index = False)
 
-norm = np.array(norm)
+print('CD8')
+print('MIM')
+N = np.arange(100,4000,25)
+best_subset, best_score = MIM(y, norm, FamiliesClusters, compute_precision,True, N, 3, plot=True) 
+print(len(best_subset), best_score)
 
 #MIM
 print('MIM')
@@ -49,10 +49,9 @@ model = EnsemblingHierarchical(np.unique(y),compute_precision,True,subsets = sub
 result  = model.fit_predict(X = x_subset, y= y)
 print(model.score_, model.recovery)
 
-'''#ANOVA
 print('ANOVA')
 N = np.arange(1000,1500,1)
-best_subset, best_score = ANOVA(y, norm, FamiliesClusters, compute_precision,True, N, plot=True)
+best_subset, best_score = ANOVA(y, norm, FamiliesClusters, compute_recovery,True, N, plot=True)
 print(len(best_subset), best_score)
 
 #Predict and evaluate on whole data  set
@@ -66,6 +65,6 @@ subsets = subsampling_genes(subset, 101, 0.25)
 
 model = EnsemblingHierarchical(np.unique(y),compute_precision,True,subsets = subsets, ensembling='voting', threshold_voting = 0.5)
 result  = model.fit_predict(X = x_subset, y= y)
-print(model.score_, model.recovery)'''
+print(model.score_, model.recovery)
 
 get_best_genes_names(best_subset, '../data/processed_data/CD8genes_interest.csv', '../data/optimized_subsets/CD8genes_best.csv')
