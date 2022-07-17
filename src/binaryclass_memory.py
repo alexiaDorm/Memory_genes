@@ -415,7 +415,6 @@ def train_best_model(fused, params):
 
     #Train and evaluate the NN
     train_model(train_dl, model, criterion, optimizer)
-    data = DataLoader(dataset, batch_size = 200000, shuffle=False)
     
     return model
 
