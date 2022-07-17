@@ -23,7 +23,7 @@ model = train_best_model(fused, params)
 #Evaluate clustering
 scores = []
 for i in data_to_fuse:
-    X = charac_matrix[i][['mean_expression','CV2ofmeans_residuals', 'memory_gene']]
+    X = charac_matrix[i][['mean_expression','CV2ofmeans_residuals']]
     y = np.expand_dims(charac_matrix[i]['memory_gene'], axis=1)
     dataset = Dataset(np.array(X), y)
     data = DataLoader(dataset, batch_size = 200000, shuffle=False)

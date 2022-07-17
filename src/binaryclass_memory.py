@@ -106,7 +106,7 @@ def load_data_val (fused:pd.DataFrame, params):
     y = np.expand_dims((fused['memory_gene']*1), axis=1)
     dataset = Dataset(np.array(X), y)
 
-    train_dl = DataLoader(dataset, batch_size = 200000, shuffle=False)
+    train_dl = DataLoader(dataset, batch_size = 256, shuffle=True)
     
     return train_dl
 
