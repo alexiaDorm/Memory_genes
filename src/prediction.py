@@ -10,7 +10,7 @@ random.seed(3)
 np.random.seed(3)
 
 #Define name of all dataset to analyze, CD8 and L1210 missing add after
-names = ['AE3', 'AE4', 'D0_exp1', 'D0_exp2', 'D6_exp1', 'D6_exp2', 'D15_exp1', 'D15_exp2', 'CD8']
+names = ['AE3', 'AE4', 'D0_exp1', 'D0_exp2', 'D6_exp1', 'D6_exp2', 'D15_exp1', 'D15_exp2', 'CD8', 'L1210']
 
 scores = []; names_scores = ['ML precision', 'ML recovery', 'CV2 precision', 'CV2 recovery']
 for name in names:

@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="prediction"
-#SBATCH --error="prediction.err"
-#SBATCH --output="prediction.out"
+#SBATCH --job-name="prediction2"
+#SBATCH --error="prediction2.err"
+#SBATCH --output="prediction2.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
