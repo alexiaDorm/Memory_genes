@@ -27,6 +27,7 @@ for name in names:
     subset = np.ones((len(gene_ML),))
     subsets_ML = subsampling_genes(subset, 100, 0.25)
 
+    print('Cv2')
     gene_CV2 = np.squeeze(pd.read_csv ('../data/CV2genes/' + name + '_CV2mean.csv'))
     norm_CV2 = np.array(norm.loc[gene_CV2]).T
     subset = np.ones((len(gene_CV2),))

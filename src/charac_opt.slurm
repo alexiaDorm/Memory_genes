@@ -1,8 +1,8 @@
 #!/bin/bash -l
 
-#SBATCH --job-name="val"
-#SBATCH --error="val.err"
-#SBATCH --output="val.out"
+#SBATCH --job-name="prediction"
+#SBATCH --error="prediction.err"
+#SBATCH --output="predicition.out"
 #SBATCH --nodes 1
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
@@ -20,7 +20,7 @@ module load gcc/8.4.0
 module load intel/19.0.5
 module load python/3.7.7
 
-srun python ValidationNN.py 
+srun python prediction.py 
  
 echo FINISHED at `date`
 
