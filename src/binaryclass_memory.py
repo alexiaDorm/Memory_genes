@@ -101,6 +101,18 @@ def load_data (fused:pd.DataFrame, params):
     
     return train_dl, test_dl
 
+def load_data_val (fused:pd.DataFrame, params):
+    X = np.array(fused.drop(columns=['memory_gene']))
+    y = np.expand_dims((fused['memory_gene']*1), axis=1)
+    dataset = Dataset(np.array(X), y)
+
+    N = len(y)
+    train, test = random_split(dataset, [math.floor(N*1), math.ceil(N*0.2)], generator=torch.Generator().manual_seed(42))
+    train_dl = DataLoader(train, batch_size= 32, shuffle=True)
+    test_dl = DataLoader(test, batch_size=256, shuffle=True)
+    
+    return train_dl, test_dl
+
 
 def load_charac():
     #Load data
@@ -395,7 +407,7 @@ class Objective(object):
     
 def train_best_model(fused, params):
     #Load data
-    train_dl, test_dl = load_data(fused,params)
+    train_dl, _ = load_data_val(fused,params)
     
     model = NN_2l(2, params)
 
