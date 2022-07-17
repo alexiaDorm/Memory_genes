@@ -7,10 +7,7 @@ import pyreadr
 
 from load_data import *
 from pred_score import *
-from Filter_FS import *
-from hybrid_FS import *
 from overlap_genes import *
-from crossValidation import *
 
 #Fixing seed to get reproducible results
 random.seed(3)
