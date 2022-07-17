@@ -504,7 +504,7 @@ def predict_evaluate(genes:list, yhat:np.array, norm:pd.DataFrame, family:np.arr
 
         model = FamiliesClusters(np.unique(family),compute_precision,True)
         pred = model.fit_predict(norm_subset,family)
-        precision, recovery_clust = model.score_, model.recovery
+        precision, recovery_clust = model.score_, compute_sensitivity(y, pred)
     
     scores = [precision, recovery_clust]
     if (mult_pred and gene_subset):
@@ -513,7 +513,7 @@ def predict_evaluate(genes:list, yhat:np.array, norm:pd.DataFrame, family:np.arr
         
         model = EnsemblingHierarchical(np.unique(family),compute_precision,True,subsets = subsets, ensembling='voting', threshold_voting = 0.5)
         result  = model.fit_predict(norm_subset, family)
-        mult_precision, mult_recovery_clust = model.score_, model.recovery
+        mult_precision, mult_recovery_clust = model.score_, compute_sensitivity(y, result)
         
         scores.extend([mult_precision,mult_recovery_clust])
     
