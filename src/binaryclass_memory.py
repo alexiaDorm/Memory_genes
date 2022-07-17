@@ -106,12 +106,9 @@ def load_data_val (fused:pd.DataFrame, params):
     y = np.expand_dims((fused['memory_gene']*1), axis=1)
     dataset = Dataset(np.array(X), y)
 
-    N = len(y)
-    train, test = random_split(dataset, [math.floor(N*1), math.ceil(N*0.2)], generator=torch.Generator().manual_seed(42))
-    train_dl = DataLoader(train, batch_size= 32, shuffle=True)
-    test_dl = DataLoader(test, batch_size=256, shuffle=True)
+    train_dl = DataLoader(dataset, batch_size = 200000, shuffle=False)
     
-    return train_dl, test_dl
+    return train_dl
 
 
 def load_charac():
