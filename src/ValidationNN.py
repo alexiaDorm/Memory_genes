@@ -41,7 +41,7 @@ for i in data_to_fuse:
 
 #Evaluate clustering on validation set 
 for i in val:
-    X = charac_matrix[i][FS]
+    X = charac_matrix[i][['mean_expression','CV2ofmeans_residuals']]
     y = np.expand_dims(charac_matrix[i]['memory_gene'], axis=1)
     dataset = Dataset(np.array(X), y)
     data = DataLoader(dataset, batch_size = 200000, shuffle=False)
@@ -58,4 +58,4 @@ for i in val:
     scores.append(score)
     
 scores_df = pd.DataFrame(scores, index = names_fused + names_val, columns= ['accuracy', 'recovery memory gene', 'FP', 'precision', 'recovery', 'ensembling precision', 'ensembling recovery'])
-scores_df.to_csv('../data/binaryClass_scores/bestNNpos3.csv', index=True)
+scores_df.to_csv('../data/binaryClass_scores/bestNN.csv', index=True)
