@@ -45,4 +45,4 @@ for name in names:
     scores.append(score)
     
 scores = pd.DataFrame(scores, columns = names_scores, index = names)
-scores.to_csv('prediction_values', index = True)
+scores.to_csv('prediction_values.csv', index = True)
