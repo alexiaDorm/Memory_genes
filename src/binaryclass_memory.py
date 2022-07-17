@@ -168,6 +168,22 @@ class NN_2l(nn.Module):
         
         return X
     
+class NN_2lRBN(nn.Module):
+    def __init__(self, n_inputs, params=None):
+        super(NN_2lRBN, self).__init__()
+        self.layers = nn.Sequential(
+        nn.Linear(n_inputs, params['n1']), 
+        nn.ReLU(),
+        nn.BatchNorm1d(params['n1']),
+        nn.Linear(params['n2'], 1)
+        )
+        
+ 
+    def forward(self, X):
+        X = self.layers(X)
+        
+        return X
+    
 class NN_3l(nn.Module):
     def __init__(self, n_inputs, params=None):
         super(NN_3l, self).__init__()
@@ -379,22 +395,12 @@ class Objective(object):
     
 def train_best_model(fused, params):
     #Load data
-    X = fused.drop(columns=['memory_gene'])
-    y = fused['memory_gene']*1
+    train_dl, test_dl = load_data(fused,params)
     
-    #Get the N top features according to mutual information
-    selector = SelectKBest(mutual_info_classif, k=params['nb_features'])
-    X_redu = selector.fit_transform(X, y)
-    cols = selector.get_support(indices=True)
-    FS = X.iloc[:,cols].columns.tolist();FS.append('CV2ofmeans_residuals'); FS.append('memory_gene'); FS = np.unique(FS)
-
-    train_dl, test_dl = load_data(fused[FS],params)
-
-    model = NN_4lRBN(len(FS)-1, params)
+    model = NN_2l(2, params)
 
     #Optmization criterion and optimizer
-    num_positives= np.sum(y); num_negatives = len(y) - num_positives
-    pos_weight  = torch.as_tensor(3., dtype=torch.float)
+    pos_weight = torch.as_tensor(4., dtype=torch.float)
     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     optimizer = SGD(model.parameters(), lr=params['learning_rate'], momentum=0.9, weight_decay=params['weight_decay'])
 
@@ -404,7 +410,6 @@ def train_best_model(fused, params):
     return model
 
 def load_all_data():
-    general_charac = pyreadr.read_r('../data/Characteristics_masterfiles/General_characteristics/EPFL_gene_master_matrix.RData')['gene_master_matrix']
 
     names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2', 
             'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 
@@ -431,10 +436,9 @@ def load_all_data():
         norm_matrix.append(norm)
         families_matrix.append(families)
 
-    #Add general characteristic
+    #Only keep mean_exp + Cv2 residual
     for i in range(0,len(charac_matrix)):
-        charac_matrix[i] = add_general_charac(charac_matrix[i], general_charac)
-        charac_matrix[i] = charac_matrix[i].drop(['skew_residuals','cell_cycle_dependence', 'skew', 'CV2ofmeans', 'exon_expr_median', 'exon_expr_mean'], axis=1)
+        charac_matrix[i] = charac_matrix[i][['mean_expression','CV2ofmeans_residuals', 'memory_gene']]
         charac_matrix[i] = charac_matrix[i].dropna()
 
     #Remove AE7, also keep BIDDYD15_2 and AE3 for validation
@@ -447,7 +451,6 @@ def load_all_data():
         charac_matrix[i], outlier_temp = remove_extreme_values(charac_matrix[i], k=200)
         outliers.append(outlier_temp)
         charac_matrix[i]['CV2ofmeans_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['CV2ofmeans_residuals']), normalize(charac_matrix[i]['mean_expression'])
-        charac_matrix[i]['length'], charac_matrix[i]['GC'] = normalize(charac_matrix[i]['length']), normalize(charac_matrix[i]['GC'])
 
     val_charac =  []
     names_val = []

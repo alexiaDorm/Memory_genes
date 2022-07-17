@@ -14,12 +14,9 @@ from binaryclass_memory import *
 fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers = load_all_data()
 
 #Train model
-params = {  'learning_rate': 7.45e-5,
-            'weight_decay' : 7.88e-8,
-            'n1': 45,
-            'n2': 22,
-            'n3': 11,
-            'nb_features' : 7}
+params = {  'learning_rate': 0.0085,
+            'weight_decay' : 1.41e-7,
+            'n1': 37}
 
 model = train_best_model(fused, params)
 
@@ -30,7 +27,7 @@ FS = feature_selection(X,y,params)
 #Evaluate clustering
 scores = []
 for i in data_to_fuse:
-    X = charac_matrix[i][FS]
+    X = charac_matrix[i][[[]
     y = np.expand_dims(charac_matrix[i]['memory_gene'], axis=1)
     dataset = Dataset(np.array(X), y)
     data = DataLoader(dataset, batch_size = 200000, shuffle=False)
