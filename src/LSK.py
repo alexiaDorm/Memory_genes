@@ -94,11 +94,11 @@ scores = []
 lib_name = []
 for i in range(0,3):
     score  = prediction_onlibrary(name=name_library[i], norm_path=libraries_LSK[i], family_info_path=family_info_LSK[i], flip=False)
-    scores.append(score); lib_name.append(name)
+    scores.append(score); lib_name.append(name_library[i])
 
 for i in range(3,len(libraries_LSK)):
     score  = prediction_onlibrary(name=name_library[i], norm_path=libraries_LSK[i], family_info_path=family_info_LSK[i], flip=True)
-    scores.append(score); lib_name.append(name)
+    scores.append(score); lib_name.append(name_library[i])
     
 names_scores = ['ML precision', 'ML recovery', 'CV2 precision', 'CV2 recovery']; 
 scores = pd.DataFrame(scores, columns = names_scores, index = lib_name)
