@@ -10,7 +10,6 @@ from pred_score import *
 from overlap_genes import *
 
 #Fixing seed to get reproducible results
-random.seed(3)
 np.random.seed(3)
 
 def prediction_onlibrary(name:str, norm_path:str, family_info_path:str, flip:bool):
