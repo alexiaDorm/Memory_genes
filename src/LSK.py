@@ -92,14 +92,10 @@ family_info_LSK = ['family_info_Weinreb_LSK_D2_exp1_library_LSK_d2_1.RData','fam
 
 scores = []
 lib_name = []
-for i in range(0,3):
-    score  = prediction_onlibrary(name=name_library[i], norm_path=libraries_LSK[i], family_info_path=family_info_LSK[i], flip=False)
-    scores.append(score); lib_name.append(name_library[i])
-
 for i in range(3,len(libraries_LSK)):
     score  = prediction_onlibrary(name=name_library[i], norm_path=libraries_LSK[i], family_info_path=family_info_LSK[i], flip=True)
-    scores.append(score); lib_name.append(name_library[i])
+    scores.append(score)
     
 names_scores = ['ML precision', 'ML recovery', 'CV2 precision', 'CV2 recovery']; 
-scores = pd.DataFrame(scores, columns = names_scores, index = lib_name)
+scores = pd.DataFrame(scores, columns = names_scores, index = name_library[3:])
 scores.to_csv('LSK_pred.csv', index = True)
