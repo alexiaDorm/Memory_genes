@@ -451,8 +451,8 @@ def load_all_data():
         charac_matrix[i] = charac_matrix[i].dropna()
 
     #Remove AE7, also keep BIDDYD15_2 and AE3 for validation
-    val = [8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29]
-    data_to_fuse = [0,1,3,4,5,6,7]
+    val = [0,8,9,10,11]
+    data_to_fuse = [1,3,4,5,6,7]
 
     outliers = []
     for i in range(0,len(charac_matrix)):
