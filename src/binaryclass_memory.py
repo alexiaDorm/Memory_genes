@@ -451,8 +451,8 @@ def load_all_data():
         charac_matrix[i] = charac_matrix[i].dropna()
 
     #Remove AE7, also keep BIDDYD15_2 and AE3 for validation
-    val = [0,8,9,10,11]
-    data_to_fuse = [1,3,4,5,6,7]
+    val = [4,8,9,10,11]
+    data_to_fuse = [0,1,3,5,6,7]
 
     outliers = []
     for i in range(0,len(charac_matrix)):
@@ -513,7 +513,7 @@ def predict_evaluate(genes:list, yhat:np.array, norm:pd.DataFrame, family:np.arr
 
         model = FamiliesClusters(np.unique(family),compute_precision,True)
         pred = model.fit_predict(norm_subset,family)
-        precision, recovery_clust = model.score_, compute_sensitivity(family, pred)
+        precision, recovery_clust = model.score_, model.recovery
     
     scores = [precision, recovery_clust]
     if (mult_pred and gene_subset):
@@ -522,7 +522,7 @@ def predict_evaluate(genes:list, yhat:np.array, norm:pd.DataFrame, family:np.arr
         
         model = EnsemblingHierarchical(np.unique(family),compute_precision,True,subsets = subsets, ensembling='voting', threshold_voting = 0.5)
         result  = model.fit_predict(norm_subset, family)
-        mult_precision, mult_recovery_clust = model.score_, compute_sensitivity(family, result)
+        mult_precision, mult_recovery_clust = model.score_, model.recovery
         
         scores.extend([mult_precision,mult_recovery_clust])
     
