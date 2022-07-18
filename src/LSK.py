@@ -76,7 +76,7 @@ def prediction_onlibrary(name:str, norm_path:str, family_info_path:str, flip:boo
     result_CV2 = model_CV2.fit_predict(X = norm_CV2, y= y)
 
     #Compute scores
-    score = [model_ML.score_, compute_sensitivity(y, result_ML), model_CV2.score_, compute_sensitivity(y, result_CV2)] 
+    score = [model_ML.score_, model_ML.recovery, model_CV2.score_, model_ML.recovery] 
     
     return score
 
@@ -92,10 +92,13 @@ family_info_LSK = ['family_info_Weinreb_LSK_D2_exp1_library_LSK_d2_1.RData','fam
 
 scores = []
 lib_name = []
+for i in range(0,3):
+    score  = prediction_onlibrary(name=name_library[i], norm_path=libraries_LSK[i], family_info_path=family_info_LSK[i], flip=False)
+    scores.append(score)
 for i in range(3,len(libraries_LSK)):
     score  = prediction_onlibrary(name=name_library[i], norm_path=libraries_LSK[i], family_info_path=family_info_LSK[i], flip=True)
     scores.append(score)
     
 names_scores = ['ML precision', 'ML recovery', 'CV2 precision', 'CV2 recovery']; 
-scores = pd.DataFrame(scores, columns = names_scores, index = name_library[3:])
+scores = pd.DataFrame(scores, columns = names_scores, index = name_library)
 scores.to_csv('LSK_pred.csv', index = True)
