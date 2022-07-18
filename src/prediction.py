@@ -41,7 +41,7 @@ for name in names:
     result_CV2 = model_CV2.fit_predict(X = norm_CV2, y= y)
     
     #Compute scores
-    score = [model_ML.score_, compute_sensitivity(y, result_ML), model_CV2.score_, compute_sensitivity(y, result_CV2)] 
+    score = [model_ML.score_, model_ML.recovery, model_CV2.score_, model_CV2.recovery] 
     scores.append(score)
     
 scores = pd.DataFrame(scores, columns = names_scores, index = names)
