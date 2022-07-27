@@ -71,11 +71,9 @@ In the data folder, that the user can dowload following this link: https://drive
 
 
 
-## Authors
+## Author
 
 * Alexia Dormann @alexiaDorm 
-* Theo Maffei @maffeitheo
-* Imane Ben M'Rad @ibenmrad
 
 #References
 * [1]  Alex R Lederer and Gioele La Manno.  The emergence and promise ofsingle-cell temporal-omics approaches.Current Opinion in Biotechnol-ogy, 63:70–78, 2020.  Nanobiotechnology   Systems Biology.

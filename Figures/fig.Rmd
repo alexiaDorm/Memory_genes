@@ -1,0 +1,67 @@
+---
+title: "fig"
+---
+
+```{r}
+pred <- read.csv('prediction_values.csv')
+rownames(pred) <- pred$X; pred$X <- NULL
+pred <- pred[1:12,]
+
+```
+
+```{r}
+library(reshape2)
+library(ggplot2)
+  
+data_frame <- data.frame(col1=c(''), ML=pred$ML.precision, CV2=pred$CV2.precision)
+  
+# creating the modified dataframe
+data_mod <- melt(data_frame, id.vars='col1', measure.vars=c('ML', 'CV2'))
+
+# creating a plot
+p <- ggplot(data_mod) +
+geom_boxplot(aes(x=col1, y=value, color=variable)) + labs(x = "", y = "precision",colour = "method")
+  
+# printing the plot
+print(p)
+
+```
+
+```{r}
+data_frame <- data.frame(col1=c(''), ML=pred$ML.recovery, CV2=pred$CV2.recovery)
+  
+# creating the modified dataframe
+data_mod <- melt(data_frame, id.vars='col1', measure.vars=c('ML', 'CV2'))
+
+# creating a plot
+p <- ggplot(data_mod) +
+geom_boxplot(aes(x=col1, y=value, color=variable)) + labs(x = "", y = "recovery",colour = "method")
+  
+# printing the plot
+print(p)
+```
+```{r}
+
+```
+
+```{r}
+pred <- read.csv('bestNN.csv')
+rownames(pred) <- pred$X; pred$X <- NULL
+
+```
+
+```{r}
+data_frame <- data.frame(col1=c(''), precision=pred$repeated.precision, recovery= pred$repeated.recovery, enrichment = pred$recovery.memory.gene)
+  
+# creating the modified dataframe
+data_mod <- melt(data_frame, id.vars='col1', measure.vars=c('precision','recovery', 'enrichment'))
+
+# creating a plot
+p <- ggplot(data_mod) +
+geom_boxplot(aes(x=col1, y=value, color=variable)) + labs(x = "", y = "", color= '')
+  
+# printing the plot
+print(p)
+```
+
+

@@ -1,6 +1,4 @@
-import numpy as np
-import pandas as pd
-import pyreadr
+from basic_import import *
 #------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Few functions processing the data
 def store_family_code_into_family_number(families_info:np.array, families_interest:np.array) :
@@ -96,99 +94,6 @@ def filter_norm_all(norm_data_sets : list, percentage : float = 0.5):
         tab_filtered.append(res)
         
     return tab_filtered
-
-def sort_features_pval(data : np.array, p_val : float = 0.05):
-    """ Finds all the genes that have at least one feature with p-value with a value smaller than 0.05
-
-      parameters:
-      data : np.array,
-      features of the genes
-      p_val : float,
-      threshold for determining if a feature is significant
-
-      returns:
-      tab : np.array,
-      binary table which indicates which gene seems to be a potential good feature (True) or not (False)
-
-    """
-    #transform data into array for future manipulations
-    #data = np.array(data)   doit être fait avant de donner le data en paramètre
-
-    #creating result table
-    tab = np.zeros(data.shape[0], dtype = bool) #Initializing each value of the table to False
-
-
-    #loop over parameters that are p-values
-    #If a value seems to be intersting for the predcition, the boolean value True is affected to it.
-    for i in range(7):
-        tab[data[:,i] < p_val] = True
-
-    return tab
-
-def sort_features(data : np.array, cond_FM : np.array, p_val : float = 0.05):
-    """ Finds all the genes that have at least one feature with p-value with a value smaller than 0.05 or an optimal FindMarker value
-
-    parameters:
-    data : np.array,
-    features of the genes
-    p_val : float,
-    threshold for determining if a feature is significant
-    cond_FM : np.array,
-    optimal value of FindMarker definded for each feature
-
-    returns:
-    tab : np.array,
-    binary table which indicates which gene seems to be a potential good feature (1) or not (0)
-
-    """
-
-    #transform data into array for future manipulations
-    #data = np.array(data)    need to be done before giving it to the parameter
-
-    #creating result table
-    tab = np.zeros(data.shape[0], dtype = bool) #Initializing each value of the table to False
-
-    #loop over parameters that are p-values
-    for i in range(7):
-        tab[data[:,i] < p_val] = True
-
-    #loop over parameters that are FindMarkers
-    #need to find the optimal number for FindMarkers
-    #writing the range that way fixes the problem of FindMarkerMAST not present in BIDDY_D0_2_20, it will iterate 7 or 8 times depeding on the file
-    for i in range(data.shape[1] - 7):   
-        tab[data[:,i+7] >= cond_FM[i]] = True
-
-    return tab
-
-def compare_feat_files(data_sets : list, cond_FM: np.array, p_val : float = 0.05):
-    """ Finds for each data_set which genes seems to be good features and the number of these good features
-
-    parameters:
-    data_sets : list,
-    contains the data of all the data sets through the form of list of arrays, each array corresponds to a data set
-    cond_FM : np.array,
-    optimal value of FindMarker definded for each feature
-    p_val : float,
-    threshold for determining if a feature is significant
-    
-    returns:
-    nbrs_good : np.array,
-    table which indicates which the number of potential good features for each data_set
-    tab_good : list,
-    list of arrays, each array corresponds to a data_set and its binary content indicates which gene seems to be a potential good feature 
-    """
-
-    N = len(data_sets)    #number of different data sets
-    nbrs_good = np.zeros(N)   #number of good features for each file
-    tab_good = [] #multi-binary indicating for each data set which gene seems to be a good feature
-
-    #iterate over each data_set
-    for i in range(N):
-        tab = sort_features(data_sets[i], cond_FM, p_val)
-        tab_good.append(tab)
-        nbrs_good[i] = tab.sum()    #number of good features
-
-    return nbrs_good, tab_good
 
 def read_charac_output(file_path:str):
     #Read .txt file 
@@ -316,4 +221,111 @@ def remove_extreme_values(data:pd.DataFrame, k:float=3):
     data = data.iloc[not_outliers]
                                                                         
     return data, outliers
+
+def compute_quantile(values:np.array):
     
+    quantile = np.quantile(values[values != 0], q= np.linspace(start=0, stop=1, num=101))
+    val_quantile = pd.cut(x=values, bins=quantile, labels= np.arange(1,101,1), include_lowest=False)
+    
+    return np.array(val_quantile)
+
+def load_all_data():
+
+    names = ['AE3', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2', 'CD8', 'L1210', 'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 'LK_LSK_D2_exp3_library_d2_5', 'LSK_D2_exp1_library_LSK_d2_1', 'LSK_D2_exp1_library_LSK_d2_2', 'LSK_D2_exp1_library_LSK_d2_3','LSK_D2_exp2_library_d2A_1', 'LSK_D2_exp2_library_d2A_2', 'LSK_D2_exp2_library_d2A_3' , 'LSK_D2_exp2_library_d2A_4', 'LSK_D2_exp2_library_d2A_5','LSK_D2_exp2_library_d2B_1','LSK_D2_exp2_library_d2B_2', 'LSK_D2_exp2_library_d2B_3', 'LSK_D2_exp2_library_d2B_4','LSK_D2_exp2_library_d2B_5', 'Hamange1', 'Hamange2', 'Hamange3', 'Hamange4', 'Hamange5', 'Hamange6', 'Hamange7', 'Hamange8', 'Wehling1', 'Wehling2']
+    
+    val = np.arange(6,len(names),1)
+    data_to_fuse = np.arange(0,6,1)
+    
+    charac_matrix = []
+    norm_matrix = []
+    families_matrix = []
+    
+    #Load charac for each dataset (load memory genes only for training set)
+    for i in range(0,len(names)):
+        #Open characteristics file
+        charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + names[i] + '__characteristics_output.txt'
+        p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + names[i] + '.txt'
+        charac_matrix.append(open_charac(charac_out_path, p_value_path, 200))
+        
+    '''for i in val:
+        #Open characteristics file
+        charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + names[i] + '__characteristics_output.txt'
+        charac_matrix.append(read_charac_output(charac_out_path))
+        charac_matrix[i]['memory_gene'] = np.zeros(charac_matrix[i]['mean_expression'].shape)'''
+        
+    for name in names:
+        #Open normalized data
+        norm_path = '../data/merged_data/' + name + '.csv'
+        fam_path = '../data/merged_data/y_' + name + '.csv'
+        norm = pd.read_csv (norm_path)
+        norm = norm.set_index('Unnamed: 0')
+        families= np.squeeze(np.array(pd.read_csv(fam_path)))
+
+        norm_matrix.append(norm)
+        families_matrix.append(families)
+
+    #Only keep mean_exp + Cv2 residual
+    for i in range(0,len(charac_matrix)):
+        charac_matrix[i] = charac_matrix[i][['mean_expression','CV2ofmeans_residuals', 'memory_gene']]
+        charac_matrix[i] = charac_matrix[i].dropna()
+
+    outliers = []
+    for i in range(0,len(charac_matrix)):
+        #Normalize skew_residuals, same for mean_expression after removing outliers
+        charac_matrix[i], outlier_temp = remove_extreme_values(charac_matrix[i], k=200)
+        outliers.append(outlier_temp)
+        
+        charac_matrix[i]['CV2ofmeans_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['CV2ofmeans_residuals']), normalize(charac_matrix[i]['mean_expression'])
+
+    val_charac =  []
+    names_val = []
+    for i in val:
+        val_charac.append(charac_matrix[i])
+        names_val.append(names[i])
+
+    fused_charac = []
+    names_fused = []
+    for i in data_to_fuse:
+        fused_charac.append(charac_matrix[i])
+        names_fused.append(names[i])
+
+    fused = pd.concat(fused_charac)
+    
+    return fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers
+
+def load_data_thres():
+
+    names = ['AE3', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2', 'CD8', 'L1210', 'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 'LK_LSK_D2_exp3_library_d2_5', 'LSK_D2_exp1_library_LSK_d2_1', 'LSK_D2_exp1_library_LSK_d2_2', 'LSK_D2_exp1_library_LSK_d2_3','LSK_D2_exp2_library_d2A_1', 'LSK_D2_exp2_library_d2A_2', 'LSK_D2_exp2_library_d2A_3' , 'LSK_D2_exp2_library_d2A_4', 'LSK_D2_exp2_library_d2A_5','LSK_D2_exp2_library_d2B_1','LSK_D2_exp2_library_d2B_2', 'LSK_D2_exp2_library_d2B_3', 'LSK_D2_exp2_library_d2B_4','LSK_D2_exp2_library_d2B_5', 'Hamange1', 'Hamange2', 'Hamange3', 'Hamange4', 'Hamange5', 'Hamange6', 'Hamange7', 'Hamange8', 'Wehling1', 'Wehling2']
+    
+    charac_matrix = []
+    norm_matrix = []
+    families_matrix = []
+    #Load charac for each dataset (load memory genes only for training set)
+    for name in names:
+        #Open characteristics file
+        charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + name + '__characteristics_output.txt'
+        p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + name + '.txt'
+        charac_matrix.append(open_charac(charac_out_path, p_value_path, 200))
+        
+        #Open normalized data
+        norm_path = '../data/merged_data/' + name + '.csv'
+        fam_path = '../data/merged_data/y_' + name + '.csv'
+        norm = pd.read_csv (norm_path)
+        norm = norm.set_index('Unnamed: 0')
+        families= np.squeeze(np.array(pd.read_csv(fam_path)))
+
+        norm_matrix.append(norm)
+        families_matrix.append(families)
+
+    for i in range(0,len(charac_matrix)):
+        #Only keep mean expression + CV2of means + memory gene status, remove gene with nan values
+        charac_matrix[i] = charac_matrix[i][['mean_expression','CV2ofmeans_residuals', 'memory_gene']]
+        charac_matrix[i] = charac_matrix[i].dropna()
+        
+        #Compute quantile of mean expression and CV2of mean residuals
+        charac_matrix[i]['mean_expression'] = compute_quantile(charac_matrix[i]['mean_expression'])
+        charac_matrix[i]['CV2ofmeans_residuals'] = compute_quantile(charac_matrix[i]['CV2ofmeans_residuals'])
+        charac_matrix[i] = charac_matrix[i].dropna()
+    
+    return charac_matrix, norm_matrix, families_matrix, names
+     

@@ -1,31 +1,18 @@
-import numpy as np
-import pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
-import sklearn
-import pyreadr
-import math 
-from typing import AnyStr, Callable
-from collections import Counter
-from load_data import open_charac, add_general_charac, normalize, remove_extreme_values
+from basic_import import *
+from load_data import open_charac, normalize, remove_extreme_values
 from pred_score import *
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
-from sklearn.model_selection import cross_val_score
-from sklearn.preprocessing import StandardScaler
 import os
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, ConcatDataset
-from sklearn.model_selection import KFold
 import optuna
 from torch.optim import SGD
 from torch.utils.data import random_split
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.feature_selection import SelectKBest, mutual_info_classif, f_classif
 
-
-#------------------------------------------------------------------------------------------------------------------------------------------------------------
+#Visualization functions
+#--------------------------------------------------------------------------------------------------------------------------
 def visualize_charac(data:pd.DataFrame):
     copy = data
     #Remove the outliers of the data before normalization of mean expression
@@ -47,27 +34,6 @@ def visualize_charac(data:pd.DataFrame):
     plt.title("All genes")
     plt.show()
 
-    
-    '''#Only non memory genes
-    non_mem = list(data.index[np.where(data['memory_gene'] == False)[0]])
-    data_non_mem = data.loc[non_mem]
-    plt.scatter(data_non_mem['skew'], data_non_mem['mean_expression'])
-    plt.xlabel("skew")
-    plt.ylabel("mean expression")
-    plt.ylim(0,np.max(data['mean_expression']))
-    plt.title("Only non-memory genes")
-    plt.show()
-
-    #Only memory genes
-    mem = list(data.index[np.where(data['memory_gene'] == True)[0]])
-    data_mem = data.loc[mem]
-    plt.scatter(data_mem['skew'], data_mem['mean_expression'])
-    plt.xlabel("skew")
-    plt.ylabel("mean expression")
-    plt.yscale('log')
-    plt.title("Only memory genes")
-    plt.show()'''
-    
 #--------------------------------------------------------------------------------
 #A few functions for Neural network training
 class Dataset(torch.utils.data.Dataset):
@@ -417,65 +383,6 @@ def train_best_model(fused, params):
     train_model(train_dl, model, criterion, optimizer)
     
     return model
-
-def load_all_data():
-
-    names = ['AE3', 'AE4', 'AE7', 'BIDDY_D0', 'BIDDY_D0_2', 'BIDDY_D6', 'BIDDY_D6_2', 'BIDDY_D15', 'BIDDY_D15_2', 
-            'LK_D2_exp1_library_d2_1', 'LK_D2_exp1_library_d2_2', 'LK_D2_exp1_library_d2_3', 'LK_LSK_D2_exp3_library_d2_1', 
-            'LK_LSK_D2_exp3_library_d2_2', 'LK_LSK_D2_exp3_library_d2_3', 'LK_LSK_D2_exp3_library_d2_4', 
-            'LK_LSK_D2_exp3_library_d2_5', 'LSK_D2_exp1_library_LSK_d2_1', 'LSK_D2_exp1_library_LSK_d2_2', 'LSK_D2_exp1_library_LSK_d2_3',
-           'LSK_D2_exp2_library_d2A_1', 'LSK_D2_exp2_library_d2A_2', 'LSK_D2_exp2_library_d2A_3' , 'LSK_D2_exp2_library_d2A_4', 'LSK_D2_exp2_library_d2A_5', 
-           'LSK_D2_exp2_library_d2B_1','LSK_D2_exp2_library_d2B_2', 'LSK_D2_exp2_library_d2B_3', 'LSK_D2_exp2_library_d2B_4', 'LSK_D2_exp2_library_d2B_5']
-    charac_matrix = []
-    norm_matrix = []
-    families_matrix = []
-    for name in names:
-        #Open characteristics file
-        charac_out_path = '../data/Characteristics_masterfiles/Dataset_specific_characteristics/' + name + '__characteristics_output.txt'
-        p_value_path = '../data/Characteristics_masterfiles/Memory_genes/P_value_estimate_CV2_ofmeans_' + name + '.txt'
-        charac_matrix.append(open_charac(charac_out_path, p_value_path, 200))
-
-        #Open normalized data
-        norm_path = '../data/merged_data/' + name + '.csv'
-        fam_path = '../data/merged_data/y_' + name + '.csv'
-        norm = pd.read_csv (norm_path)
-        norm = norm.set_index('Unnamed: 0')
-        families= np.squeeze(np.array(pd.read_csv(fam_path)))
-
-        norm_matrix.append(norm)
-        families_matrix.append(families)
-
-    #Only keep mean_exp + Cv2 residual
-    for i in range(0,len(charac_matrix)):
-        charac_matrix[i] = charac_matrix[i][['mean_expression','CV2ofmeans_residuals', 'memory_gene']]
-        charac_matrix[i] = charac_matrix[i].dropna()
-
-    #Remove AE7, also keep BIDDYD15_2 and AE3 for validation
-    val = [4,8,9,10,11]
-    data_to_fuse = [0,1,3,5,6,7]
-
-    outliers = []
-    for i in range(0,len(charac_matrix)):
-        #Normalize skew_residuals, same for mean_expression after removing outliers
-        charac_matrix[i], outlier_temp = remove_extreme_values(charac_matrix[i], k=200)
-        outliers.append(outlier_temp)
-        charac_matrix[i]['CV2ofmeans_residuals'], charac_matrix[i]['mean_expression'] = normalize(charac_matrix[i]['CV2ofmeans_residuals']), normalize(charac_matrix[i]['mean_expression'])
-
-    val_charac =  []
-    names_val = []
-    for i in val:
-        val_charac.append(charac_matrix[i])
-        names_val.append(names[i])
-
-    fused_charac = []
-    names_fused = []
-    for i in data_to_fuse:
-        fused_charac.append(charac_matrix[i])
-        names_fused.append(names[i])
-
-    fused = pd.concat(fused_charac)
-    
-    return fused, charac_matrix, norm_matrix, families_matrix, names_val, names_fused, data_to_fuse, val, outliers
 
 def feature_selection(X,y,params):
     #Get the N top features according to mutual information
