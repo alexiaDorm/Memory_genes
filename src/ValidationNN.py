@@ -4,7 +4,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import sklearn
 import pyreadr
-from load_data import open_charac, add_general_charac
+from load_data import load_all_data
 from binaryclass_memory import *
 
 
@@ -20,7 +20,7 @@ model = train_best_model(fused, params)
 
 #Evaluate clustering
 scores = []
-for i in range(0,charac_matrix.shape[0]):
+for i in range(0,len(charac_matrix)):
     X = charac_matrix[i][['mean_expression','CV2ofmeans_residuals']]
     y = np.expand_dims(charac_matrix[i]['memory_gene'], axis=1)
     dataset = Dataset(np.array(X), y)
@@ -38,4 +38,4 @@ for i in range(0,charac_matrix.shape[0]):
     scores.append(score)
     
 scores_df = pd.DataFrame(scores, index = names_fused + names_val, columns= ['accuracy', 'recovery memory gene', 'FP', 'precision', 'recovery', 'ensembling precision', 'ensembling recovery'])
-scores_df.to_csv('../data/binaryClass_scores/bestNN.csv', index=True)
+scores_df.to_csv('../data/NN.csv', index=True)

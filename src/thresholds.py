@@ -1,6 +1,7 @@
 from basic_import import *
 from load_data import load_data_thres
-from binaryclass_memory import predict_evaluate
+from binaryclass_memory import predict_evaluate, compute_enrichment, predict_evaluate
+from sklearn.metrics import balanced_accuracy_score
 
 def thresholds_method(X:pd.DataFrame, y:np.array):
     
